@@ -127,9 +127,6 @@ class MainWindow(QMainWindow):
         slider_hbox.addWidget(slider_label)
         slider_hbox.addWidget(self.volume_slider)
 
-
-
-
         # set widget as central widget
         widget = QWidget()
         widget.setLayout(options_grid)

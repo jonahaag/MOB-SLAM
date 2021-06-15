@@ -4,5 +4,13 @@ MobSLAM is a Simultaneous Localization and Mapping system for deformable environ
 TODO
 1. further cleanup
 2. efficiency improvements: triangle selection, multithreading, projection,...
-3. switch to python entirerly??
-4. networkx compute graph for every image
+3. TODO as commented in MainWindow.py regarding the layout
+
+# Prerequisites
+1. Sofa Python3 bindings
+2. qtpy, PyQt5
+3. pyqtgraph
+4. networkx 
+5. cv2
+
+Window should be full screen and look like 'main_window.png' at the beginning. 

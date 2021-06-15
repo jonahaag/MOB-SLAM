@@ -229,7 +229,7 @@ class EngineORB:
                               camera_positions=np.array(list(self.mat.workspace['sofaGroundTruth_pos_slam'])))
         
     def start_slam(self):
-        print("Start SLAM")
+        #print("Start SLAM")
         self.is_mapping = True
         self.real_world.animation_end.connect(self.update_slam) # set a qt signal to update slam after sim step
         self.viewer_info(viewer_size=self.viewer.get_viewer_size(), intrinsics=self.viewer.get_intrinsic_parameters())

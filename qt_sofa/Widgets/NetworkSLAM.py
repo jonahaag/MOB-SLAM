@@ -8,12 +8,8 @@ Created on Thu May 27 10:19:20 2021
 import numpy as np
 import networkx as nx
 import cv2 as cv
-from matplotlib import pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 import math
 import datetime
-import plotly.graph_objects as go
-from mayavi import mlab
 
 def extract_feature_graph(img_rgb):
     # convert rgb image to greyscale
@@ -46,7 +42,7 @@ def draw_img_and_graph(image_item, img, graph_item):
     edges = np.array([list(edge) for edge in nx.edges(G)])
     graph_item.setData(pos=pts,adj=edges,pxMode=True,size=5.0,brush='g',pen='r')
 
-def plot_feature_graph_onto_image(img, kp, G):
+#def plot_feature_graph_onto_image(img, kp, G):
     img_with_kp = cv.drawKeypoints(img,kp,outImage=None,color=(0,255,0),flags=0)
     # cv.imshow("Image", img2)
     # cv.waitKey(0)
@@ -59,7 +55,7 @@ def plot_feature_graph_onto_image(img, kp, G):
     nx.draw(G,pos,node_size=10,node_color='red',edgecolors='red',edge_color='blue',width=0.1)
     plt.show()
 
-def initialize_network_3D(worldpoints):
+#def initialize_network_3D(worldpoints):
     # input: matched features (and their position) within those images, corresponding 3D worldpoints
     # output: network of 3D points, edges between all points since they all have been detected in both images
     begin_time = datetime.datetime.now()
@@ -84,14 +80,14 @@ def initialize_network_3D(worldpoints):
     pts = alternative_plot_network_3D(G)
     return pts
     
-def update_network_3D():
+#def update_network_3D():
     # update position of exisiting nodes
     # delete old nodes
     # add new nodes and edges
     
     return 0
 
-def plot_network_3D(G, angle):
+#def plot_network_3D(G, angle):
 
     # Get node positions
     pos = nx.get_node_attributes(G, 'pos')
@@ -139,37 +135,6 @@ def plot_network_3D(G, angle):
 
     plt.show()
 
-def alternative_plot_network_3D(G):
-    mlab.clf()
-    # Get node positions
-    pos = nx.get_node_attributes(G, 'pos')
-    xyz = np.array([pos[v] for v in sorted(G)])
-    
-    # Get number of nodes
-    n = G.number_of_nodes()
-    # Get the maximum number of edges adjacent to a single node
-    edge_max = max([G.degree(i) for i in range(n)])
-    scalars = [(G.degree(i)/edge_max) for i in range(n)]
-    
-    # scalar colors
-    # scalars = np.array(list(G.nodes())) + 5
-    pts = mlab.points3d(
-        xyz[:, 0],
-        xyz[:, 1],
-        xyz[:, 2],
-        scalars,
-        scale_factor=0.025,
-        scale_mode="none",
-        colormap="Purples",
-        resolution=100,
-    )
-    
-    pts.mlab_source.dataset.lines = np.array(list(G.edges()))
-    tube = mlab.pipeline.tube(pts, tube_radius=0.001)
-    mlab.pipeline.surface(tube, color=(0.8, 0.8, 0.8))
-    mlab.show()
-    
-    return pts
         
 ##########################################
 # import matlab.engine

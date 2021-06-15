@@ -16,6 +16,7 @@ import sys
 #sys.path.append("Widgets")
 #import NetworkSLAM as nxs
 #import networkx as nx
+
 class SecondWindow(QMainWindow):
     def __init__(self):
         super(SecondWindow, self).__init__()
@@ -348,7 +349,6 @@ class MainWindow(QMainWindow):
     def on_colormode_checkbox_change(self):
         return 0
     
-
     def __del__(self):
         # Restore sys.stdout
         sys.stdout = sys.__stdout__
