@@ -5,6 +5,8 @@ Created on Mon Feb 22 11:55:53 2021
 
 @author: jona
 """
+from Widgets.NetworkSLAM import extract_feature_graph
+from ctypes import sizeof
 from qtpy.QtCore import *
 from qtpy.QtWidgets import *
 import matlab.engine
@@ -15,6 +17,11 @@ from .SofaSim import SofaSim
 import csv
 import os
 import math
+import sys
+sys.path.append("Widgets")
+import NetworkSLAM as nxs
+import SlamResultPlotter as srp
+import cv2
 
 
 def compute_trajectory(keypoints):
@@ -43,7 +50,11 @@ def compute_trajectory(keypoints):
 
 class EngineORB:
    
-    def __init__(self, mat_dir, skip_images_init=2, skip_images_main=0, mode="fromfile", trajectory_path="./trajectories/test/"):   
+    def __init__(self, mat_dir, 
+                 worldpoint_plot, cam_pos_plot, ground_truth_plot, 
+                 image_item, graph_item,
+                 skip_images_init=2, skip_images_main=0,
+                  mode="fromfile", trajectory_path="./trajectories/test/"):   
         # print("starting matlab engine ...")
         # # Start matlab engine
         # self.mat = matlab.engine.start_matlab() #"-desktop -r 'format short'"
@@ -58,6 +69,13 @@ class EngineORB:
         self.skip_counter = skip_images_init #start immediately
         self.is_mapping = False
         self.is_initialized = False
+        self.build_network = False
+        self.is_extracting_graph = False
+        self.worldpoint_plot = worldpoint_plot
+        self.cam_pos_plot = cam_pos_plot
+        self.ground_truth_plot = ground_truth_plot
+        self.image_item = image_item
+        self.graph_item = graph_item
         self.slam_step = 0
         self.sim_step = 0
         self.positions = []
@@ -168,8 +186,9 @@ class EngineORB:
                 self.skip_images = self.skip_images_main
                 self.n_keyFrames = 2
                 self.add_pos_to_gt(self.n_keyFrames-1) # save camera position corresponding to second initilization frame
-            
-                
+                #Initialize and plot Networkx graph
+                #self.pts = nxs.initialize_network_3D(self.mat.workspace['worldpoints'])
+                     
     def main_slam(self, image):
         self.slam_step += 1
         maindic = {"currI": image}
@@ -178,6 +197,8 @@ class EngineORB:
         nodedic = {"currentNodePositions": sim_nodes}
         savemat(os.path.join(self.mat_dir,"currentNodePositions.mat"), nodedic)
         self.mat.main_loop_slam(nargout=0)
+        if self.is_extracting_graph:
+            nxs.draw_img_and_graph(self.image_item, image, self.graph_item)
         if self.mat.workspace['isKeyFrame']: # save camera position corresponding to keyframes
             self.n_keyFrames += 1
             self.add_pos_to_gt(self.n_keyFrames-1)
@@ -188,16 +209,13 @@ class EngineORB:
                      "sofaGroundTruth_ori": self.ground_truth_orientations}
             savemat(os.path.join(self.mat_dir,"groundTruth/groundTruth.mat"), gtdic)
             self.mat.main_loop_slam2(nargout=0)
-            # min_n = 5
-            # if self.n_keyFrames == min_n: 
-            #     self.mat.scale_map_and_initialize_projection(nargout=0)
-            # elif self.n_keyFrames >= min_n+1:
-            #     # projection stuff
-            #     # self.map_prediction() # first forward predict previsouly projected points
-            #     self.mat.project_map_points(nargout=0) # then project new points
             
-        
-        
+            #self.pts = nxs.initialize_network_3D(self.mat.workspace['worldpoints'])
+            srp.plot_slam_results(worldpoint_plot=self.worldpoint_plot, 
+                                  cam_pos_plot=self.cam_pos_plot,
+                                  worldpoints=np.array(list(self.mat.workspace['worldpoints'])), 
+                                  camera_positions=np.array(list(self.mat.workspace['camera_positions'])))
+             
     def stop_slam(self):
         # save ground truth of key frames as mat-file
         self.is_mapping = False
@@ -207,7 +225,43 @@ class EngineORB:
                      "sofaGroundTruth_ori": self.ground_truth_orientations}
         savemat(os.path.join(self.mat_dir,"groundTruth/groundTruth.mat"), finishdic)
         self.mat.finish_slam(nargout=0)
+        srp.plot_ground_truth(ground_truth_plot=self.ground_truth_plot,
+                              camera_positions=np.array(list(self.mat.workspace['sofaGroundTruth_pos_slam'])))
         
+    def start_slam(self):
+        print("Start SLAM")
+        self.is_mapping = True
+        self.real_world.animation_end.connect(self.update_slam) # set a qt signal to update slam after sim step
+        self.viewer_info(viewer_size=self.viewer.get_viewer_size(), intrinsics=self.viewer.get_intrinsic_parameters())
+
+    def start_sim(self):
+        self.real_world.animation_start.connect(self.update_sim_step)
+        self.real_world.animation_start.connect(self.update_sim_camera)
+        # self.real_world.animation_start.connect(self.viewer.paintGL)
+        if self.mode == "fromfile":
+            self.real_world.animation_start.connect(self.read_camera_position)
+        elif self.mode == "tofile" and self.trajectory_path != "./trajectories/navigation/":
+            self.real_world.animation_end.connect(self.write_camera_position)
+        elif self.mode == "keypoint_navigation":
+            self.real_world.animation_end.connect(self.enforce_trajectory)
+            # self.real_world.animation_end.connect(self.write_camera_position)    
+    
+    def stop_sim(self):
+        if self.is_mapping: 
+            self.stop_slam()
+        if self.mode == "tofile":
+            if self.trajectory_path == "./trajectories/navigation/":
+                with open(os.path.join(self.trajectory_path,"keypoints3.txt"),"w") as f:
+                    wr = csv.writer(f,delimiter=" ",quoting=csv.QUOTE_NONNUMERIC)
+                    wr.writerows(self.keypoints)
+            else:
+                with open(os.path.join(self.trajectory_path,"camera_positions.txt"),"w") as f:
+                    wr = csv.writer(f,delimiter=" ",quoting=csv.QUOTE_NONNUMERIC)
+                    wr.writerows(self.positions)
+                with open(os.path.join(self.trajectory_path,"camera_orientations.txt"),"w") as f:
+                    wr = csv.writer(f,delimiter=" ",quoting=csv.QUOTE_NONNUMERIC)
+                    wr.writerows(self.orientations)
+
     def read_camera_position(self):
         if self.current_line < self.n_positions:
             self.cam_pos.value = self.positions[self.current_line,:]
@@ -256,9 +310,7 @@ class EngineORB:
         else: 
             self.positions.append(list(self.cam_pos.value))
             self.orientations.append(list(self.cam_ori.value))
-        
-            
-            
+                   
     def keyPressEvent(self, QKeyEvent):
         if QKeyEvent.key() == Qt.Key_Space:
             # if animating
@@ -266,45 +318,20 @@ class EngineORB:
             # write trajectories, if in tofile-mode
             # else just stop the simulation 
             if self.real_world.is_animating:
-                if self.is_mapping: 
-                    self.stop_slam()
-                if self.mode == "tofile":
-                    if self.trajectory_path == "./trajectories/navigation/":
-                        with open(os.path.join(self.trajectory_path,"keypoints3.txt"),"w") as f:
-                            wr = csv.writer(f,delimiter=" ",quoting=csv.QUOTE_NONNUMERIC)
-                            wr.writerows(self.keypoints)
-                    else:
-                        with open(os.path.join(self.trajectory_path,"camera_positions.txt"),"w") as f:
-                            wr = csv.writer(f,delimiter=" ",quoting=csv.QUOTE_NONNUMERIC)
-                            wr.writerows(self.positions)
-                        with open(os.path.join(self.trajectory_path,"camera_orientations.txt"),"w") as f:
-                            wr = csv.writer(f,delimiter=" ",quoting=csv.QUOTE_NONNUMERIC)
-                            wr.writerows(self.orientations)
+                self.stop_sim()
             # when starting the animation
             # get new position from inputfile, if in fromfile-mode
             # append position to array, if in tofile-mode (write to file at the end)
             # else use computed trajctory
             else:
-                self.real_world.animation_start.connect(self.update_sim_step)
-                self.real_world.animation_start.connect(self.update_sim_camera)
-                # self.real_world.animation_start.connect(self.viewer.paintGL)
-                if self.mode == "fromfile":
-                    self.real_world.animation_start.connect(self.read_camera_position)
-                elif self.mode == "tofile" and self.trajectory_path != "./trajectories/navigation/":
-                    self.real_world.animation_end.connect(self.write_camera_position)
-                elif self.mode == "keypoint_navigation":
-                    self.real_world.animation_end.connect(self.enforce_trajectory)
-                    # self.real_world.animation_end.connect(self.write_camera_position)
-                
+                self.start_sim()
+
         if QKeyEvent.key() == Qt.Key_G: # G for GO
             # start/stop slam only if animating
             if self.is_mapping:
                 self.stop_slam()
             elif self.real_world.is_animating:
-                print("Start SLAM")
-                self.is_mapping = True
-                self.real_world.animation_end.connect(self.update_slam) # set a qt signal to update slam after sim step
-                self.viewer_info(viewer_size=self.viewer.get_viewer_size(), intrinsics=self.viewer.get_intrinsic_parameters())
+                self.start_slam()
                 
         if QKeyEvent.key() == Qt.Key_F: # F for forces
             if self.real_world.is_animating:
@@ -329,6 +356,20 @@ class EngineORB:
         if QKeyEvent.key() == Qt.Key_H:
             if self.mode == "tofile" and self.trajectory_path == "./trajectories/navigation/":
                 self.write_camera_position()
+        
+        if QKeyEvent.key() == Qt.Key_N: # N for network
+            if not self.build_network:
+                self.build_network = True
+                img = self.viewer.get_sofa_screen_shot()
+                cv2.imshow('image',img)
+                cv2.waitKey(0)
+                cv2.destroyWindow('image')
+                cv2.waitKey(1)
+                print(len(img))
+                print("Start Network")
+            else:
+                self.build_network = False
+                print("Stop Network")
     
     def update_slam(self):
         # at every animation_end-event, either do nothing or pass image
@@ -336,13 +377,12 @@ class EngineORB:
         if self.skip_counter == self.skip_images:
             self.skip_counter = 0
             if self.is_initialized:
-                self.main_slam(image=self.viewer.get_screen_shot())
+                self.main_slam(image=self.viewer.get_sofa_screen_shot())
             else:
-                self.initialize_slam(image=self.viewer.get_screen_shot())
+                self.initialize_slam(image=self.viewer.get_sofa_screen_shot())
         else:
             self.skip_counter += 1
-            
-            
+                 
     def map_prediction(self):
         # input: slam_map, forces/simulation nodes
         # projects new map points onto geometry
@@ -363,3 +403,6 @@ class EngineORB:
         # do only when keyframe is detected?
         self.sofa_sim.root.camera.position = self.cam_pos
         self.sofa_sim.root.camera.orientation = self.cam_ori
+        
+
+

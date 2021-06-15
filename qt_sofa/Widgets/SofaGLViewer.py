@@ -61,7 +61,7 @@ class SofaGLViewer(QOpenGLWidget):
         super(SofaGLViewer, self).__init__()
         self.visuals_node = sofa_visuals_node
         self.camera = camera
-        self.setMinimumSize(800, 600)
+        #self.setBaseSize(16,9)
         self.z_far = camera.zFar  # get these values using self.z***.value because they are sofa Data objects
         self.z_near = camera.zNear
         self.setFocusPolicy(Qt.StrongFocus)
@@ -77,6 +77,8 @@ class SofaGLViewer(QOpenGLWidget):
         top = 2.0 * near / pm[1][1] + bottom
         # changed self.width(), self.height()
         _, _, width, height = glGetIntegerv(GL_VIEWPORT)
+        height = height//2
+        width = width//2
         cx = (left * width)/(left - right)
         cy = (top * height)/(top - bottom)
         fx = -near * cx / left
@@ -146,7 +148,16 @@ class SofaGLViewer(QOpenGLWidget):
         buff = glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE)
         image = np.frombuffer(buff, dtype=np.uint8)
         return np.flipud(image.reshape(height, width, 3))
-    
+
+    def get_sofa_screen_shot(self):
+        """ Returns the RGB image array for the current view """
+        _, _, width, height = glGetIntegerv(GL_VIEWPORT)
+        height = height//2
+        width = width//2
+        buff = glReadPixels(0, height, width, height, GL_RGB, GL_UNSIGNED_BYTE)
+        image = np.frombuffer(buff, dtype=np.uint8)
+        return np.flipud(image.reshape(height, width, 3)) 
+            
     # def get_screen_locations(self, points: List[List[float]]):
     #     """
     #     :param points: list of 3D world coordinate points
@@ -168,4 +179,6 @@ class SofaGLViewer(QOpenGLWidget):
     
     def get_viewer_size(self):
         _, _, width, height = glGetIntegerv(GL_VIEWPORT)
+        height = height//2
+        width = width//2
         return width, height

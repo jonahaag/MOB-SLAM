@@ -32,7 +32,7 @@ directionAndDepth = update(directionAndDepth, mapPointSet, vSetKeyFrames.Views, 
 
 
 % Visualize initial map points and camera trajectory
-mapPlot       = helperVisualizeMotionAndStructure(vSetKeyFrames, mapPointSet);
+%mapPlot       = helperVisualizeMotionAndStructure(vSetKeyFrames, mapPointSet);
 
 % Show legend
-showLegend(mapPlot);
+%showLegend(mapPlot);

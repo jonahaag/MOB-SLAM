@@ -2,7 +2,7 @@
 % % Use ground truth so compare/optimize trajectory and calculate error
 compareGroundTruth
 
-saveResults = true;
+saveResults = false;
 if saveResults
     if projectionInitialized
         save("results/resultsProjection.mat", 'vSetKeyFrames', 'mapPointSet',...

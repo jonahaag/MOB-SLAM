@@ -38,8 +38,8 @@ else
 end
 
 %% Plot the actual camera trajectory
-plot3(mapPlot.Axes, sofaGroundTruth_pos_slam(:,1), sofaGroundTruth_pos_slam(:,2), sofaGroundTruth_pos_slam(:,3), ...
-                'g','LineWidth',2, 'DisplayName', 'Actual trajectory');
+%plot3(mapPlot.Axes, sofaGroundTruth_pos_slam(:,1), sofaGroundTruth_pos_slam(:,2), sofaGroundTruth_pos_slam(:,3), ...
+%                'g','LineWidth',2, 'DisplayName', 'Actual trajectory');
 % Show legend
-showLegend(mapPlot);
+%showLegend(mapPlot);
 

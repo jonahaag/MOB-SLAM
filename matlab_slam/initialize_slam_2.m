@@ -22,3 +22,9 @@ lastKeyFrameIdx   = currFrameIdx - 1;
 addedFramesIdx    = [initIm; lastKeyFrameIdx];
 
 isLoopClosed      = false;
+
+worldpoints = mapPointSet.WorldPoints;
+camera_positions = zeros(currKeyFrameId, 3);
+for i = 1:currKeyFrameId
+    camera_positions(i,:) = vSetKeyFrames.Views.AbsolutePose(i).Translation;
+end

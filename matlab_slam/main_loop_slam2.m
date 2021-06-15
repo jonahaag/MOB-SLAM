@@ -101,7 +101,7 @@ end
 
 
 %%  Visualize 3D world points and camera trajectory
-updatePlot(mapPlot, vSetKeyFrames, mapPointSet);
+%updatePlot(mapPlot, vSetKeyFrames, mapPointSet);
 
 %% Loop Closure
 % % Initialize the loop closure database
@@ -143,4 +143,11 @@ lastKeyFrameIdx = currFrameIdx;
 addedFramesIdx  = [addedFramesIdx; currFrameIdx]; 
 currFrameIdx  = currFrameIdx + 1;
 currKeyImage = currI;
+
+%% Prepare data for python  
+worldpoints = mapPointSet.WorldPoints;
+camera_positions = zeros(currKeyFrameId, 3);
+for i = 1:currKeyFrameId
+    camera_positions(i,:) = vSetKeyFrames.Views.AbsolutePose(i).Translation;
+end
 

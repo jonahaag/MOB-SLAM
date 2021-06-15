@@ -31,20 +31,16 @@ class QSofaViewKeyboardController(QObject):
         self.camera_timer.start()
         self.time_at_last_update = time.time()
 
-    def set_viewers(self, viewers):
-        if hasattr(viewers, '__iter__'):
-            self.viewers = viewers
-        else:
-            self.viewers = [viewers]
+    def set_viewer(self, viewer: SofaGLViewer):
+        self.viewer = viewer
         self._viewer_set = True
         try:
             self._update_timer.disconnect()
         except TypeError:
             pass
-        for viewer in self.viewers:
-            self._update_timer.timeout.connect(viewer.update)
-            viewer.key_pressed.connect(self.keyPressEvent)
-            viewer.key_released.connect(self.keyReleaseEvent)
+        self._update_timer.timeout.connect(self.viewer.update)
+        self.viewer.key_pressed.connect(self.keyPressEvent)
+        self.viewer.key_released.connect(self.keyReleaseEvent)
 
     def start_auto_update(self, rate=0.05):
         if not self._viewer_set:

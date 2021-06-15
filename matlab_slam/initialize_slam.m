@@ -2,7 +2,7 @@ clear all; close all;
 addpath 'helperFunctions' 'initialization_steps' 'groundTruth' 'projectionAndPrediction'
 load initI.mat
 initIm = 1;
-doProjections = 1;
+doProjections = 0;
 projectionInitialized = 0;
 minNumberOfKeyframesBeforeProjection = 5; % !> minNumberOfKeyframesBeforeScalings
 minNumberOfKeyframesBeforeScaling = 5;
