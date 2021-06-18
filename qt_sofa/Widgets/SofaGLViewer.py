@@ -6,16 +6,16 @@ import Sofa
 from OpenGL.GL import *
 from OpenGL.GLU import *
 import numpy as np
+from typing import List
+from PIL import Image
 
 
 def quaternion_rotation_matrix(Q):
     """
     https://automaticaddison.com/how-to-convert-a-quaternion-to-a-rotation-matrix/
     Covert a quaternion into a full three-dimensional rotation matrix.
-
     Input
     :param Q: A 4 element array representing the quaternion (q0,q1,q2,q3)
-
     Output
     :return: A 3x3 element matrix representing the full 3D rotation matrix.
              This rotation matrix converts a point in the local reference
@@ -52,6 +52,8 @@ def quaternion_rotation_matrix(Q):
 class SofaGLViewer(QOpenGLWidget):
     key_pressed = Signal(QKeyEvent)
     key_released = Signal(QKeyEvent)
+    scroll_event = Signal(QWheelEvent)
+    resizedGL = Signal(float, float)  # width, height
     
     def __init__(self,
                  sofa_visuals_node,
@@ -61,10 +63,22 @@ class SofaGLViewer(QOpenGLWidget):
         super(SofaGLViewer, self).__init__()
         self.visuals_node = sofa_visuals_node
         self.camera = camera
-        #self.setBaseSize(16,9)
         self.z_far = camera.zFar  # get these values using self.z***.value because they are sofa Data objects
         self.z_near = camera.zNear
         self.setFocusPolicy(Qt.StrongFocus)
+        self.background_color = [25/255,35/255,45/255,1]
+        self.spheres = []
+
+    def make_viewer_transparent(self, make_transparent=True):
+        """ This will only make the background of the viewer transparent if the background_color alpha is set to 0"""
+        self.setAttribute(Qt.WA_TranslucentBackground, make_transparent)
+        self.setAttribute(Qt.WA_AlwaysStackOnTop, make_transparent)
+
+    def set_background_color(self, color):
+        """
+        :param color: [r, g, b, alpha] alpha determines opacity. Use 0 to save images with a transparent background
+        """
+        self.background_color = color
 
     def get_intrinsic_parameters(self):
         # https://github.com/opencv/opencv_contrib/blob/master/modules/viz/src/types.cpp
@@ -75,10 +89,10 @@ class SofaGLViewer(QOpenGLWidget):
         right = 2 * near / pm[0][0] + left
         bottom = near * (pm[1][2]-1) / pm[1][1]
         top = 2.0 * near / pm[1][1] + bottom
-        # changed self.width(), self.height()
-        _, _, width, height = glGetIntegerv(GL_VIEWPORT)
-        height = height//2
-        width = width//2
+        width, height = self.width(), self.height()
+        #_, _, width, height = glGetIntegerv(GL_VIEWPORT)
+        #height = height//2
+        #width = width//2
         cx = (left * width)/(left - right)
         cy = (top * height)/(top - bottom)
         fx = -near * cx / left
@@ -104,6 +118,7 @@ class SofaGLViewer(QOpenGLWidget):
     def paintGL(self):
         self.makeCurrent()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        glClearColor(*self.background_color)
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
         gluPerspective(self.camera.findData('fieldOfView').value, (self.width() / self.height()), self.z_near.value, self.z_far.value)
@@ -117,6 +132,7 @@ class SofaGLViewer(QOpenGLWidget):
         self.camera.widthViewport = self.width()
         self.camera.heightViewport = self.height()
         glViewport(0, 0, w, h)
+        self.resizedGL.emit(w, h)
 
     def get_depth_image(self, scaled_for_viewing=True, return_type=np.uint16):
         """" Get the depth map as an array for displaying"""
@@ -134,7 +150,7 @@ class SofaGLViewer(QOpenGLWidget):
     def get_depth_map(self):
         """ Get the depth value for each pixel in image """
         self.makeCurrent()
-        _, _, width, height = glGetIntegerv(GL_VIEWPORT)
+        width, height = self.width(), self.height()
         buff = glReadPixels(0, 0, width, height, GL_DEPTH_COMPONENT, GL_FLOAT)
         image = np.frombuffer(buff, dtype=np.float32)
         image = image.reshape(height, width)
@@ -142,12 +158,19 @@ class SofaGLViewer(QOpenGLWidget):
         far, near = self.z_far.value, self.z_near.value
         return -far * near / (far + image * (near - far))
 
-    def get_screen_shot(self):
+    def get_screen_shot(self, return_with_alpha=False):
         """ Returns the RGB image array for the current view """
-        _, _, width, height = glGetIntegerv(GL_VIEWPORT)
-        buff = glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE)
-        image = np.frombuffer(buff, dtype=np.uint8)
-        return np.flipud(image.reshape(height, width, 3))
+        self.makeCurrent()
+        #_, _, width, height = glGetIntegerv(GL_VIEWPORT)
+        width, height = self.width(), self.height()
+        if return_with_alpha:
+            buff = glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE)
+            image = np.frombuffer(buff, dtype=np.uint8)
+            return np.flipud(image.reshape(height, width, 4))
+        else:
+            buff = glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE)
+            image = np.frombuffer(buff, dtype=np.uint8)
+            return np.flipud(image.reshape(height, width, 3))
 
     def get_sofa_screen_shot(self):
         """ Returns the RGB image array for the current view """
@@ -158,16 +181,25 @@ class SofaGLViewer(QOpenGLWidget):
         image = np.frombuffer(buff, dtype=np.uint8)
         return np.flipud(image.reshape(height, width, 3)) 
             
-    # def get_screen_locations(self, points: List[List[float]]):
-    #     """
-    #     :param points: list of 3D world coordinate points
-    #     :return: (x, y, z) positions in the screen coordinates
-    #     """
-    #     points = np.asarray(points)
-    #     screen_positions = np.zeros((len(points), 3))
-    #     for i in range(len(points)):
-    #         screen_positions[i] = gluProject(points[i][0], points[i][1], points[i][2])
-    #     return screen_positions
+    def save_image(self, filename):
+        """
+        Save image to file
+        :param filename: name of file to save image to. extension determines file type (i.e. "pic.png")
+        """
+        image = self.get_screen_shot(return_with_alpha=True)
+        img = Image.fromarray(image)
+        img.save(filename)
+
+    def get_screen_locations(self, points: List[List[float]]):
+        """
+        :param points: list of 3D world coordinate points
+        :return: (x, y, z) positions in the screen coordinates
+        """
+        points = np.asarray(points)
+        screen_positions = np.zeros((len(points), 3))
+        for i in range(len(points)):
+            screen_positions[i] = gluProject(points[i][0], points[i][1], points[i][2])
+        return screen_positions
     
     def keyPressEvent(self, a0: QKeyEvent) -> None:
         self.key_pressed.emit(a0)
@@ -176,9 +208,37 @@ class SofaGLViewer(QOpenGLWidget):
     def keyReleaseEvent(self, a0: QKeyEvent) -> None:
         self.key_released.emit(a0)
         super(SofaGLViewer, self).keyReleaseEvent(a0)
+
+    def wheelEvent(self, a0: QWheelEvent) -> None:
+        self.scroll_event.emit(a0)
+        super(SofaGLViewer, self).wheelEvent(a0)
+
+    def draw_spheres(self, positions, radii, colors, clear_existing=True):
+        """
+        :param clear_existing: whether or not to clear other spheres from the scene
+        :param positions: list of x,y,z positions
+        :param radii: list of radii for each sphere
+        :param colors: list of colors [r, g, b] for each sphere
+        """
+        if clear_existing:
+            self.clear_spheres()
+        for i in range(len(positions)):
+            new_node = self.visuals_node.addChild('sphere' + str(i))
+            self.spheres.append(new_node)
+            new_node.addObject("MeshObjLoader", name="loader" + str(i), filename="mesh/sphere.obj", scale=radii[i],
+                               translation=positions[i])
+            new_node.addObject("OglModel", name="i" + str(i), src="@loader" + str(i), color=colors[i])
+        Sofa.Simulation.initVisual(self.visuals_node)
+        Sofa.Simulation.initTextures(self.visuals_node)
+
+    def clear_spheres(self):
+        """
+        clear all spheres from scene
+        """
+        [x.detachFromGraph() for x in self.spheres]
     
     def get_viewer_size(self):
         _, _, width, height = glGetIntegerv(GL_VIEWPORT)
         height = height//2
         width = width//2
-        return width, height
+        return self.width(), self.height()

@@ -12,5 +12,6 @@ TODO
 3. pyqtgraph
 4. networkx 
 5. cv2
+6. qdarkstyle
 
 Window should be full screen and look like 'main_window.png' at the beginning. 

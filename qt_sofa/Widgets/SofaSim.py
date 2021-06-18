@@ -82,7 +82,7 @@ class SofaSim(QObject):
         ellipsoid.addObject('ConstantForceField', name="CFF", indices=[1], forces=[0,0,0]) #, showArrowSize="0.01"
 
         # place light and a camera
-        self.root.addObject("BackgroundSetting", color=[1,1,1])
+        #self.root.addObject("BackgroundSetting", color=[25/255,35/255,45/255,1.0])
         self.root.addObject("LightManager")
         self.root.addObject("DirectionalLight", direction=[0, 1, 1])
         self.root.addObject("DirectionalLight", direction=[0, -1, -1])

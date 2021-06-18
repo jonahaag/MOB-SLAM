@@ -13,6 +13,8 @@ import pyqtgraph.widgets
 import pyqtgraph.opengl as gl
 import numpy as np
 import sys
+from Widgets import NetworkSLAM as nxs
+import qdarkstyle
 #sys.path.append("Widgets")
 #import NetworkSLAM as nxs
 #import networkx as nx
@@ -88,8 +90,9 @@ class MainWindow(QMainWindow):
         self.font = 'Helvetica'
         self.background_color = 'black'
         self.text_color = 'white'
-        self.buttonstyle_not_clicked = 'QPushButton { background-color: '+self.background_color+'; border-style: outset; border-width: 2px; border-radius: 10px; border-color: red; color: lightgray; min-width: 10em; padding: 6px;}'
-        self.buttonstyle_clicked = 'QPushButton { background-color: '+self.background_color+'; border-style: outset; border-width: 2px; border-radius: 10px; border-color: green; color: lightgray; min-width: 10em; padding: 6px;}'
+        self.colortheme = 'dark'
+        self.buttonstyle_not_clicked = 'QPushButton {color:white}'
+        self.buttonstyle_clicked = 'QPushButton {color:red}'
         
 
         ### maybe add sofa_view seperately once real camera_data is used
@@ -107,10 +110,18 @@ class MainWindow(QMainWindow):
         self.worldpoint_plot = gl.GLScatterPlotItem()
         self.cam_pos_plot = gl.GLLinePlotItem()
         self.ground_truth_plot = gl.GLLinePlotItem()
-        axis = gl.GLAxisItem()
+        self.axis = gl.GLAxisItem()
+        self.grid = gl.GLGridItem()
         self.slam_results_plot.addItem(self.cam_pos_plot)
         self.slam_results_plot.addItem(self.ground_truth_plot)
-        self.slam_results_plot.addItem(axis)
+        self.slam_results_plot.addItem(self.axis)
+        self.slam_results_plot.addItem(self.grid)
+        self.slam_results_plot.setBackgroundColor('#19232D')
+        self.slam_results_plot.opts['distance'] = 3.5         ## distance of camera from center
+        self.slam_results_plot.opts['fov'] = 60                ## horizontal field of view in degrees
+        self.slam_results_plot.opts['elevation'] = -65          ## camera's angle of elevation in degrees
+        self.slam_results_plot.opts['azimuth'] = 30            ## camera's azimuthal angle in degrees 
+        self.slam_results_plot.pan(dx=0,dy=0,dz=0.3,relative='global')
 
         # add graphics window to layout, this widget consists of...
         # ...viewbox, which consist of...
@@ -126,6 +137,7 @@ class MainWindow(QMainWindow):
         self.feature_graph_viewbox.addItem(self.graph_item)
         self.graph_item.setZValue(10) # display graph item ontop of image
         #self.feature_graph_viewbox.setContentsMargins(0,0,0,0)
+        self.feature_graph_window.setBackground(background=None)
         
 
         # Install the custom output stream
@@ -133,23 +145,20 @@ class MainWindow(QMainWindow):
 
         # text edit to which the console output is redirected
         self.text_edit_console = QTextEdit()
-        self.text_edit_console.setStyleSheet('QTextEdit {background-color:black; color:white, border-width:0px;}')
         self.text_edit_console.setCursorWidth(0)
         self.text_edit_console.setReadOnly(True)
-        self.text_edit_console.setAlignment(Qt.AlignCenter)
-        self.text_edit_console.setFont(QFont(self.font, 14))
+        #self.text_edit_console.setAlignment(Qt.AlignCenter)
+        #self.text_edit_console.setFont(QFont(self.font, 14))
         print('Welcome to SLAM Dashboard!')
 
         # button to start/stop the simulation
         self.button_sim_start = QPushButton("Start Simulation")
-        self.button_sim_start.setFont(QFont(self.font, self.font_size, QFont.Bold))
         self.button_sim_start.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.button_sim_start.clicked.connect(self.on_click_button_sim_start)
         
 
         # button to start/stop slam
         self.button_slam_start = QPushButton("Start SLAM")
-        self.button_slam_start.setFont(QFont(self.font, self.font_size, QFont.Bold))
         self.button_slam_start.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.button_slam_start.setDisabled(True)
         self.button_slam_start.clicked.connect(self.on_click_button_slam_start)
@@ -162,47 +171,14 @@ class MainWindow(QMainWindow):
         slider_frame = QFrame()
         slider_hbox = QHBoxLayout()
         slider_frame.setLayout(slider_hbox)
-        slider_frame.setStyleSheet('border-style: outset; border-width: 2px; border-radius: 10px; border-color: #a9a9a9; min-width: 10em; padding: 6px;')
         self.volume_slider = QSlider(Qt.Horizontal, self)
         self.volume_slider.setRange(0,100)
         self.volume_slider.setValue(33)
         self.volume_slider.setFocusPolicy(Qt.NoFocus)
         self.volume_slider.setPageStep(1)
-        self.volume_slider.setStyleSheet(\
-        "QSlider::groove:horizontal {\
-        border: 1px solid #999999;\
-        height: 8px; \
-        background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:2, y2:0, "+get_groove_color(color_range)+");\
-        margin: -4px 0;\
-        border-radius: 4px\
-        }QSlider::handle:horizontal {\
-        background-color: black;\
-        border: 1px solid #5c5c5c;\
-        border-color: white;\
-        border-radius: 4px;\
-        width: 8px;\
-        margin: -2px 0;\
-        }\
-        QSlider{border-width:0px}")
         self.volume_slider.valueChanged.connect(self.on_value_changed_slider)
-        #QSlider::sub-page:horizontal {\
-        #background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, "+self.groove_color+");\
-        #border: 1px solid #999999;\
-        #height: 8px;\
-        #margin: -4px 0; \
-        #}QSlider::add-page:horizontal {\
-        #background: white;\
-        #border: 1px solid #999999;\
-        #height: 8px;\
-        #margin: -4px 0; \
-        #}
-        #self.volume_slider.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         slider_label = QLabel()
         slider_label.setText('SOFA object cavity')
-        slider_label.setStyleSheet('QLabel {background-color: '+self.background_color+'; color: lightgray; border-width:0px}')
-        slider_label.setFont(QFont(self.font, self.font_size, QFont.Bold))
-        slider_hbox.setSpacing(0)
-        slider_hbox.setContentsMargins(0,0,0,0)
         slider_hbox.addWidget(slider_label)
         slider_hbox.addWidget(self.volume_slider)
 
@@ -213,7 +189,7 @@ class MainWindow(QMainWindow):
         self.colormode_checkbox = QCheckBox()
         self.colormode_checkbox.setText('Darkmode')
         self.colormode_checkbox.setChecked(True)
-        self.networkx_checkbox.stateChanged.connect(self.on_colormode_checkbox_change)
+        self.colormode_checkbox.stateChanged.connect(self.on_colormode_checkbox_change)
         self.checkbox_layout = QHBoxLayout()
         self.checkbox_layout.addWidget(self.networkx_checkbox)
         self.checkbox_layout.addWidget(self.colormode_checkbox)
@@ -228,9 +204,6 @@ class MainWindow(QMainWindow):
         self.options_layout.addLayout(self.checkbox_layout)
         self.options_frame = QFrame()
         self.options_frame.setLayout(self.options_layout)
-        self.options_frame.setStyleSheet('background-color:black;')
-        self.networkx_checkbox.setStyleSheet('QCheckBox{background-color:black; color: lightgray;}')
-        self.colormode_checkbox.setStyleSheet('QCheckBox{background-color:black; color: lightgray;}')
 
         # add grid as main layout, stretch rows and columns
         self.main_grid = QGridLayout()
@@ -251,7 +224,7 @@ class MainWindow(QMainWindow):
         self.widget.setLayout(self.main_grid)
         self.setCentralWidget(self.widget)
         self.setWindowTitle("SLAM Dashboard")
-        self.setStyleSheet('QMainWindow{background-color: white;}' + self.buttonstyle_not_clicked)
+        self.setStyleSheet(qdarkstyle.load_stylesheet(qdarkstyle.dark.palette.DarkPalette))
         self.showFullScreen()
 
         # for some weird reason this needs to be added later else python crashes on my mac (only true for GLScatterPlotItem and GLImageItem)
@@ -268,15 +241,11 @@ class MainWindow(QMainWindow):
                                     skip_images_init=4, 
                                     skip_images_main=10, 
                                     mode="keypoint_navigation", #tofile, fromfile, keypoint_navigation 
-                                    trajectory_path="./trajectories/navigation/",
-                                    worldpoint_plot = self.worldpoint_plot,
-                                    cam_pos_plot = self.cam_pos_plot,
-                                    ground_truth_plot = self.ground_truth_plot,
-                                    image_item = self.image_item,
-                                    graph_item = self.graph_item)
+                                    trajectory_path="./trajectories/navigation/")
         self.mat_engine.set_image_source(self.real_world)
         self.mat_engine.set_viewer(self.view_real)
         self.mat_engine.set_sim(self.sofa_sim)
+        self.mat_engine.set_main_window(self)
         
 
     def keyPressEvent(self, QKeyEvent):
@@ -290,14 +259,13 @@ class MainWindow(QMainWindow):
                 self.sofa_sim.start_sim()
         if QKeyEvent.key() == Qt.Key_P:
             print(self.slam_results_plot.cameraPosition())
+            print(self.view_real.get_viewer_size())
 
     def on_click_button_sim_start(self):
         if self.real_world.is_animating:
             print("Simulation stopped")
             if self.mat_engine.is_mapping:
-                print('Mapping has been stopped as the simulation was stopped')
-                self.button_slam_start.setText('Start SLAM')
-                self.button_slam_start.setStyleSheet(self.buttonstyle_not_clicked)
+                self.on_click_button_slam_start()
             self.real_world.stop_sim()
             self.sofa_sim.stop_sim()
             self.mat_engine.stop_sim()
@@ -326,29 +294,55 @@ class MainWindow(QMainWindow):
             self.button_slam_start.setStyleSheet(self.buttonstyle_clicked)
     
     def on_value_changed_slider(self,value):
-        self.volume_slider.setStyleSheet(\
-        "QSlider::groove:horizontal {\
-        border: 1px solid #999999;\
-        height: 8px; \
-        background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:2, y2:0, "+get_groove_color(color_range)+");\
-        margin: -4px 0;\
-        border-radius: 4px\
-        }QSlider::handle:horizontal {\
-        background-color: black;\
-        border: 1px solid #5c5c5c;\
-        border-color: white;\
-        border-radius:" + str(value//11+4) +"px;\
-        width:" + str(value//5+8) +"px;\
-        margin: -" + str(value//14+2) +"px 0;\
-        }\
-        QSlider{border-width:0px}")
-    
-    def on_networkx_checkbox_change(self):
-        self.mat_engine.is_extracting_graph = not self.mat_engine.is_extracting_graph
-
-    def on_colormode_checkbox_change(self):
+        # self.volume_slider.setStyleSheet(\
+        # "QSlider::groove:horizontal {\
+        # border: 1px solid #999999;\
+        # height: 8px; \
+        # background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:2, y2:0, "+get_groove_color(color_range)+");\
+        # margin: -4px 0;\
+        # border-radius: 4px\
+        # }QSlider::handle:horizontal {\
+        # background-color: black;\
+        # border: 1px solid #5c5c5c;\
+        # border-color: white;\
+        # border-radius:" + str(value//11+4) +"px;\
+        # width:" + str(value//5+8) +"px;\
+        # margin: -" + str(value//14+2) +"px 0;\
+        # }\
+        # QSlider{border-width:0px}")
         return 0
     
+    def extract_network(self):
+        # TODO skip_counter
+        nxs.draw_img_and_graph(image_item=self.image_item, image=self.view_real.get_screen_shot(), graph_item=self.graph_item)
+
+    def on_networkx_checkbox_change(self):
+        if self.mat_engine.is_extracting_graph:
+            self.real_world.animation_end.disconnect(self.extract_network)
+        else:
+            self.real_world.animation_end.connect(self.extract_network)
+        self.mat_engine.is_extracting_graph = not self.mat_engine.is_extracting_graph
+    
+    def on_colormode_checkbox_change(self):
+        if self.colortheme == 'dark':
+            self.colortheme = 'light'
+            self.setStyleSheet(qdarkstyle.load_stylesheet(qdarkstyle.light.palette.LightPalette))
+            self.feature_graph_window.setBackground(background='#CED1D4')
+            self.slam_results_plot.setBackgroundColor('#CED1D4')
+            self.view_real.set_background_color([1.0,1.0,1.0,1.0])
+            self.buttonstyle_not_clicked = 'QPushButton {color:#19232D}'
+            self.buttonstyle_clicked = 'QPushButton {color:red}'
+            self.text_edit_console.setStyleSheet('QTextEdit {background-color:#CED1D4; color:#19232D}')
+        else:
+            self.colortheme = 'dark'
+            self.setStyleSheet(qdarkstyle.load_stylesheet(qdarkstyle.dark.palette.DarkPalette))
+            self.feature_graph_window.setBackground(background=None)
+            self.slam_results_plot.setBackgroundColor('#19232D')
+            self.view_real.set_background_color([25/255,35/255,45/255,1])
+            self.buttonstyle_not_clicked = 'QPushButton {color:white}'
+            self.buttonstyle_clicked = 'QPushButton {color:red}'
+            self.text_edit_console.setStyleSheet('QTextEdit {background-color:#19232D; color:white}')
+
     def __del__(self):
         # Restore sys.stdout
         sys.stdout = sys.__stdout__
