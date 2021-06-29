@@ -337,17 +337,9 @@ class EngineORB:
                 
         if QKeyEvent.key() == Qt.Key_K: # F for forces
             if self.real_world.is_animating:
-                print("Start Forces")   
-                if self.real_world.root.CameraController.immediateForce1: 
-                    self.real_world.root.CameraController.immediateForce1 = False
-                    self.sofa_sim.root.CameraController.immediateForce1 = False
-                    self.real_world.root.CameraController.immediateForce2 = True
-                    self.sofa_sim.root.CameraController.immediateForce2 = True
-                else:
-                    self.real_world.root.CameraController.immediateForce1 = True
-                    self.sofa_sim.root.CameraController.immediateForce1 = True
-                    self.real_world.root.CameraController.immediateForce2 = False
-                    self.sofa_sim.root.CameraController.immediateForce2 = False
+                print("Start Displacement")   
+                self.real_world.root.CameraController.displaceNode = True
+                #self.real_world.root.CameraController.indices = [1] 
                 
         if QKeyEvent.key() == Qt.Key_H:
             if self.mode == "tofile" and self.trajectory_path == "./trajectories/navigation/":

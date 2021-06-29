@@ -14,13 +14,14 @@ class controller(Sofa.Core.Controller):
         self.camera = self.node.camera
         self.totalTime = 0.0
         self.object = self.node.getChild('ellipsoid')
+
         self.startForce = 0
         self.endForce = 15
         self.startTime = False
         self.endTime = 20
         self.startForces = False
-        self.immediateForce1 = False
-        self.immediateForce2 = False
+
+        self.displaceNode = False
         
 
     def onAnimateEndEvent(self, event):
@@ -42,22 +43,13 @@ class controller(Sofa.Core.Controller):
                 forces.append([xForce,yForce,zForce])
             self.object.CFF.findData('indices').value = self.object.boxROI.findData("indices").value
             self.object.CFF.findData('forces').value = forces
-            
-        if self.immediateForce1:
-            n = len(self.object.boxROI.findData("indices").value)
-            forces = []
-            for i in range(1,n+1):
-                forces.append([5,5,5])
-                self.object.CFF.findData('indices').value = self.object.boxROI.findData("indices").value
-                self.object.CFF.findData('forces').value = forces
-       
-        if self.immediateForce2:
-            n = len(self.object.boxROI.findData("indices").value)
-            forces = []
-            for i in range(1,n+1):
-                forces.append([10,10,10])
-                self.object.CFF.findData('indices').value = self.object.boxROI.findData("indices").value
-                self.object.CFF.findData('forces').value = forces
+            print(self.object.boxROI.findData("indices").value)
 
+        if self.displaceNode:
+            #self.indices = self.object.boxROI.findData("indices").value
+            self.nodeTranslation = [0.0,0.0,5.5]
+            self.nodeRotation = [1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0]
+            self.object.AMC.translation.value = self.nodeTranslation
+            self.displaceNode = False
 
     # def onKeypressedEvent(self, event):

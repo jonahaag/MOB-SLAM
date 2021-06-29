@@ -81,6 +81,13 @@ class SofaSim(QObject):
         # ellipsoid.addObject('BoxROI', name='boxROI', box='-0.5 -0.3 0.7 0.5 0.2 1.5', drawBoxes=True)
         ellipsoid.addObject('ConstantForceField', name="CFF", indices=[1], forces=[0,0,0]) #, showArrowSize="0.01"
 
+
+
+        ellipsoid.addObject('PairBoxROI', name="PairBox", inclusiveBox='-1.5 -1.5 0.2 1.5 0 1.5', includedBox='-1.3 -1.3 0.4 1.3 -0.2 1.3')
+        ellipsoid.addObject('AffineMovementConstraint', name="AMC",
+                             template="Vec3d", indices="@PairBox.indices", meshIndices = "@boxROI.indices",
+                             translation=[0.0,0.0,0.0], rotation=[1, 0, 0, 0, 1, 0, 0, 0, 1])
+
         # place light and a camera
         #self.root.addObject("BackgroundSetting", color=[25/255,35/255,45/255,1.0])
         self.root.addObject("LightManager")
@@ -88,7 +95,7 @@ class SofaSim(QObject):
         self.root.addObject("DirectionalLight", direction=[0, -1, -1])
         self.root.addObject("InteractiveCamera", name="camera", position=[0, 0, 5],
                             lookAt=[0, 0, 0], distance=5,
-                            fieldOfView=45, zNear=0.160738, zFar=20)
+                            fieldOfView=60, zNear=0.160738, zFar=20)
         #?????? so strange
                             
         # add controller

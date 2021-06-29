@@ -28,27 +28,52 @@ class SecondWindow(QMainWindow):
         # self.setCentralWidget(self.view_sim)
         # self.setWindowTitle("Simulated scene")
 
-    ## create Mayavi Widget and show
-
-color_range =['#e7f0fd','#accbee','#bac8e0']            
-def get_groove_color(color_range):
-
-    groove_color_range = 'stop:0 ' + color_range[0]
-    current_color = color_range[0]
-    for i in range(0,len(color_range),1):
-        if color_range[i] == current_color :
-            continue
-        else:
-            current_color = color_range[i]
-            groove_color_range += ', stop:'+ str((2*i-1)/2/len(color_range)) + ' ' + color_range[i-1] + ', stop:'+ str((2*i)/2/len(color_range)) + ' ' + color_range[i] 
-
-    groove_color_range += ', stop:1 ' + color_range[-1]        
-    return groove_color_range
-
 class EmittingStream(QtCore.QObject):
     textWritten = QtCore.pyqtSignal(str)
     def write(self, text):
         self.textWritten.emit(str(text))
+
+class CustomDialog(QDialog):
+    def __init__(self,colortheme):
+        super(CustomDialog, self).__init__()
+        # set initials values to widgets
+        self.general_tab = QWidget()
+        self.general_tab_layout = QVBoxLayout()
+        self.general_tab.setLayout(self.general_tab_layout)
+
+        self.slam_tab = QWidget()
+        self.slam_tab_layout = QVBoxLayout()
+        self.slam_tab.setLayout(self.slam_tab_layout)
+
+        self.sofa_tab = QWidget()
+        self.sofa_tab_layout = QVBoxLayout()
+        self.sofa_tab.setLayout(self.sofa_tab_layout)
+
+        self.networkx_tab = QWidget()
+        self.networkx_tab_layout = QVBoxLayout()
+        self.networkx_tab.setLayout(self.networkx_tab_layout)
+
+
+        self.tab = QTabWidget()
+        #tab.setTabPosition(QTabWidget.West)
+        self.tab.addTab(self.general_tab,'General')
+        self.tab.addTab(self.slam_tab,'SLAM')
+        self.tab.addTab(self.sofa_tab,'SOFA')
+        self.tab.addTab(self.networkx_tab,'NetworkX')
+
+        self.main_layout = QVBoxLayout() # cannot set widget directly, so this layout just contains the QTabWidget
+        self.main_layout.addWidget(self.tab)
+        self.buttonBox = QDialogButtonBox(self)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.rejected)
+        self.main_layout.addWidget(self.buttonBox)
+        self.setLayout(self.main_layout)
+        self.resize(640,360)
+        if colortheme == 'dark':
+            self.setStyleSheet(qdarkstyle.load_stylesheet(qdarkstyle.dark.palette.DarkPalette))
+        else:
+            self.setStyleSheet(qdarkstyle.load_stylesheet(qdarkstyle.light.palette.LightPalette))
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -79,9 +104,6 @@ class MainWindow(QMainWindow):
         # self.simWindow.show() # views do not update correctly
         self.sofa_sim = self.simWindow.sofa_sim
         self.view_sim = self.simWindow.view_sim
-        # right now view of the second window is updated after every simulation step of the first window (aka the real world)
-        # later measurement data can be used to adjust the position of the simulated camera accordingly or the tracking results can be used as well
-        # ??? views do not update correctly
         self.sofa_sim.animation_end.connect(self.view_sim.update) 
         
 
@@ -152,35 +174,38 @@ class MainWindow(QMainWindow):
         print('Welcome to SLAM Dashboard!')
 
         # button to start/stop the simulation
-        self.button_sim_start = QPushButton("Start Simulation")
-        self.button_sim_start.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.button_sim_start.clicked.connect(self.on_click_button_sim_start)
+        self.sim_start_button = QPushButton("Start Simulation")
+        self.sim_start_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.sim_start_button.clicked.connect(self.on_click_button_sim_start)
         
 
         # button to start/stop slam
-        self.button_slam_start = QPushButton("Start SLAM")
-        self.button_slam_start.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.button_slam_start.setDisabled(True)
-        self.button_slam_start.clicked.connect(self.on_click_button_slam_start)
+        self.slam_start_button = QPushButton("Start SLAM")
+        self.slam_start_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.slam_start_button.setDisabled(True)
+        self.slam_start_button.clicked.connect(self.on_click_button_slam_start)
 
-        # TODO menu for light/dark mode selection, networkx graph extraction, skip_images_main, navigation_mode etc.
-        #---------
+        # settings button
+        self.settings_button = QPushButton("Settings")
+        self.settings_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.settings_button.clicked.connect(self.on_click_button_settings)
 
         # slider to adjust volume of the sofa object
         # TODO actually add cavity and sofa controller functions
-        slider_frame = QFrame()
-        slider_hbox = QHBoxLayout()
-        slider_frame.setLayout(slider_hbox)
+        self.slider_frame = QFrame()
+        self.slider_hbox = QHBoxLayout()
+        self.slider_frame.setLayout(self.slider_hbox)
         self.volume_slider = QSlider(Qt.Horizontal, self)
         self.volume_slider.setRange(0,100)
         self.volume_slider.setValue(33)
         self.volume_slider.setFocusPolicy(Qt.NoFocus)
         self.volume_slider.setPageStep(1)
         self.volume_slider.valueChanged.connect(self.on_value_changed_slider)
-        slider_label = QLabel()
-        slider_label.setText('SOFA object cavity')
-        slider_hbox.addWidget(slider_label)
-        slider_hbox.addWidget(self.volume_slider)
+        self.slider_label = QLabel()
+        self.slider_label.setText('SOFA object cavity')
+        self.slider_label.setAlignment(Qt.AlignCenter)
+        self.slider_hbox.addWidget(self.slider_label)
+        self.slider_hbox.addWidget(self.volume_slider)
 
         # add checkboxes inside a horizontal layout
         self.networkx_checkbox = QCheckBox()
@@ -196,36 +221,65 @@ class MainWindow(QMainWindow):
 
 
         # add nested layout with options
-        self.options_layout = QVBoxLayout()
-        self.options_layout.addWidget(self.text_edit_console)
-        self.options_layout.addWidget(self.button_sim_start)
-        self.options_layout.addWidget(self.button_slam_start)
-        self.options_layout.addWidget(slider_frame)
+        self.options_layout = QHBoxLayout()
+        self.options_layout.addWidget(self.sim_start_button)
+        self.options_layout.addWidget(self.slam_start_button)
+        self.options_layout.addWidget(self.settings_button)
+        self.options_layout.addWidget(self.slider_frame)
         self.options_layout.addLayout(self.checkbox_layout)
+        self.options_layout.addWidget(self.text_edit_console)
         self.options_frame = QFrame()
         self.options_frame.setLayout(self.options_layout)
 
         # add grid as main layout, stretch rows and columns
-        self.main_grid = QGridLayout()
-        self.main_grid.setRowStretch(0, 1)
-        self.main_grid.setRowStretch(1, 1)
-        self.main_grid.setColumnStretch(0,1)
-        self.main_grid.setColumnStretch(1,1)
-        self.main_grid.addWidget(self.view_real, 0, 0)
-        self.main_grid.addWidget(self.slam_results_plot, 0, 1)
-        self.main_grid.addWidget(self.feature_graph_window, 1, 0)
-        self.main_grid.addWidget(self.options_frame,1,1)
-        self.main_grid.setContentsMargins(0,0,0,0)
-        self.main_grid.setSpacing(1)
+        # self.main_grid = QGridLayout()
+        # self.main_grid.setRowStretch(0, 1)
+        # self.main_grid.setRowStretch(1, 1)
+        # self.main_grid.setColumnStretch(0,1)
+        # self.main_grid.setColumnStretch(1,1)
+        # self.main_grid.addWidget(self.view_real, 0, 0)
+        # self.main_grid.addWidget(self.slam_results_plot, 0, 1)
+        # self.main_grid.addWidget(self.feature_graph_window, 1, 0)
+        # self.main_grid.addWidget(self.options_frame,1,1)
+        # self.main_grid.setContentsMargins(0,0,0,0)
+        # self.main_grid.setSpacing(1)
 
-        # TODO dynamic layout design
+        #create dock widgets for options and plots that contain the previously created widgets/layouts
+        self.options_dockWidget = QDockWidget(self)
+        self.options_dockWidget.setWidget(self.options_frame)
+        self.options_dockWidget.setFeatures(QDockWidget.NoDockWidgetFeatures)
+
+        self.slam_plot_dockWidget = QDockWidget(self)
+        self.slam_plot_dockWidget.setWidget(self.slam_results_plot)
+        self.slam_plot_dockWidget.setTitleBarWidget(QLabel(''))
+        self.slam_plot_dockWidget.setWindowTitle('SLAM Results')
+
+        self.feature_graph_dockWidget = QDockWidget(self)
+        self.feature_graph_dockWidget.setWidget(self.feature_graph_window)
+        self.feature_graph_dockWidget.setTitleBarWidget(QLabel(''))
+        self.feature_graph_dockWidget.setWindowTitle('Feature Graph Plot')
+
+
         # create QWidget to contain the first level grid layout, set as central widget in main window
         self.widget = QWidget()
-        self.widget.setLayout(self.main_grid)
+        self.view_layout = QVBoxLayout()
+        self.view_layout.addWidget(self.view_real)
+        self.widget.setLayout(self.view_layout)
         self.setCentralWidget(self.widget)
+        #self.setCentralWidget(self.view_real)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        
+        self.addDockWidget(Qt.TopDockWidgetArea,self.options_dockWidget)
+        self.addDockWidget(Qt.RightDockWidgetArea,self.slam_plot_dockWidget)
+        self.addDockWidget(Qt.RightDockWidgetArea,self.feature_graph_dockWidget)
+        self.tabifyDockWidget(self.slam_plot_dockWidget,self.feature_graph_dockWidget)
+        self.slam_plot_dockWidget.raise_()
+
+        # window settings (size, stylesheet, ...)
         self.setWindowTitle("SLAM Dashboard")
         self.setStyleSheet(qdarkstyle.load_stylesheet(qdarkstyle.dark.palette.DarkPalette))
         self.showFullScreen()
+        self.resize_widgets()
 
         # for some weird reason this needs to be added later else python crashes on my mac (only true for GLScatterPlotItem and GLImageItem)
         self.slam_results_plot.addItem(self.worldpoint_plot)
@@ -248,6 +302,23 @@ class MainWindow(QMainWindow):
         self.mat_engine.set_main_window(self)
         
 
+    def resize_widgets(self):
+        self.screen_height = self.height()
+        self.screen_width = self.width()
+        print('Window is ' + str(self.screen_width) + 'x' + str(self.screen_height))
+        self.options_frame.setFixedSize(1920,120)
+        self.options_dockWidget.setFixedSize(1920,120)
+        self.view_real.setMaximumSize(960,960)
+        self.view_real.setMinimumHeight(960)
+        self.slam_results_plot.resize(960,960)
+        self.feature_graph_window.resize(960,960)
+        # self.options_frame.setFixedSize(self.screen_width,self.screen_height//9)
+        # self.options_dockWidget.setFixedSize(self.screen_width,self.screen_height//9)
+        # self.view_real.setMaximumSize(self.screen_width//2,self.screen_height-self.screen_height//9)
+        # self.view_real.setMinimumHeight(self.screen_height-self.screen_height//9)
+        # self.slam_results_plot.resize(self.screen_width//2,self.screen_height-self.screen_height//9)
+        # self.feature_graph_window.resize(self.screen_width//2,self.screen_height-self.screen_height//9)
+
     def keyPressEvent(self, QKeyEvent):
         if QKeyEvent.key() == Qt.Key_Space:
             if self.real_world.is_animating:
@@ -269,30 +340,34 @@ class MainWindow(QMainWindow):
             self.real_world.stop_sim()
             self.sofa_sim.stop_sim()
             self.mat_engine.stop_sim()
-            self.button_slam_start.setDisabled(True)
-            self.button_sim_start.setText('Start Simulation')
-            self.button_sim_start.setStyleSheet(self.buttonstyle_not_clicked)
+            self.slam_start_button.setDisabled(True)
+            self.sim_start_button.setText('Start Simulation')
+            self.sim_start_button.setStyleSheet(self.buttonstyle_not_clicked)
         else: 
             print("Simulation started")
             self.real_world.start_sim()
             self.sofa_sim.start_sim()
             self.mat_engine.start_sim()
-            self.button_slam_start.setDisabled(False)
-            self.button_sim_start.setText('Stop Simulation')
-            self.button_sim_start.setStyleSheet(self.buttonstyle_clicked)
+            self.slam_start_button.setDisabled(False)
+            self.sim_start_button.setText('Stop Simulation')
+            self.sim_start_button.setStyleSheet(self.buttonstyle_clicked)
 
     def on_click_button_slam_start(self):
         if self.mat_engine.is_mapping:
             print("SLAM stopped")
             self.mat_engine.stop_slam()
-            self.button_slam_start.setText('Start SLAM')
-            self.button_slam_start.setStyleSheet(self.buttonstyle_not_clicked)
+            self.slam_start_button.setText('Start SLAM')
+            self.slam_start_button.setStyleSheet(self.buttonstyle_not_clicked)
         else: 
             print("SLAM started")
             self.mat_engine.start_slam()
-            self.button_slam_start.setText('Stop SLAM')
-            self.button_slam_start.setStyleSheet(self.buttonstyle_clicked)
+            self.slam_start_button.setText('Stop SLAM')
+            self.slam_start_button.setStyleSheet(self.buttonstyle_clicked)
     
+    def on_click_button_settings(self):
+        w = CustomDialog(self.colortheme)
+        w.exec()
+
     def on_value_changed_slider(self,value):
         # self.volume_slider.setStyleSheet(\
         # "QSlider::groove:horizontal {\
