@@ -16,7 +16,7 @@ class controller(Sofa.Core.Controller):
         self.object = self.node.getChild('ellipsoid')
 
         self.startForce = 0
-        self.endForce = 15
+        self.endForce = 50
         self.startTime = False
         self.endTime = 20
         self.startForces = False
@@ -28,8 +28,8 @@ class controller(Sofa.Core.Controller):
         self.totalTime += event['dt'] # dt = 0.01     
         
         if self.startForces and not self.startTime:
-            self.startTime = self.totalTime
-            self.endTime = self.startTime + self.endTime
+            self.startTime = self.totalTime # set current time as start time of the forces
+            self.endTime = self.startTime + self.endTime # set start time + duration as end time of the forces
             
         if self.startForces and self.totalTime <= self.endTime:
             n = len(self.object.boxROI.findData("indices").value)
@@ -43,7 +43,6 @@ class controller(Sofa.Core.Controller):
                 forces.append([xForce,yForce,zForce])
             self.object.CFF.findData('indices').value = self.object.boxROI.findData("indices").value
             self.object.CFF.findData('forces').value = forces
-            print(self.object.boxROI.findData("indices").value)
 
         if self.displaceNode:
             #self.indices = self.object.boxROI.findData("indices").value
@@ -52,4 +51,4 @@ class controller(Sofa.Core.Controller):
             self.object.AMC.translation.value = self.nodeTranslation
             self.displaceNode = False
 
-    # def onKeypressedEvent(self, event):
+    #   def onKeypressedEvent(self, event):

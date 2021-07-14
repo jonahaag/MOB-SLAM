@@ -161,8 +161,10 @@ class SofaGLViewer(QOpenGLWidget):
     def get_screen_shot(self, return_with_alpha=False):
         """ Returns the RGB image array for the current view """
         self.makeCurrent()
-        #_, _, width, height = glGetIntegerv(GL_VIEWPORT)
-        width, height = self.width(), self.height()
+        # the height and width functions are kinda buggy when using a mac, because the screen ratio is so weird
+        # TODO get this more robust on a mac
+        _, _, width, height = glGetIntegerv(GL_VIEWPORT)
+        # width, height = self.width(), self.height()
         if return_with_alpha:
             buff = glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE)
             image = np.frombuffer(buff, dtype=np.uint8)
@@ -238,7 +240,7 @@ class SofaGLViewer(QOpenGLWidget):
         [x.detachFromGraph() for x in self.spheres]
     
     def get_viewer_size(self):
+        self.makeCurrent()
         _, _, width, height = glGetIntegerv(GL_VIEWPORT)
-        height = height//2
-        width = width//2
-        return self.width(), self.height()
+        # width, height = self.width(), self.height()
+        return width, height

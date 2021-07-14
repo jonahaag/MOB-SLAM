@@ -1,7 +1,6 @@
 from qtpy.QtCore import *
 from qtpy.QtWidgets import *
 from qtpy.QtGui import *
-from PyQt5 import QtCore, QtGui
 from .SofaGLViewer import SofaGLViewer
 from .SofaSim import SofaSim
 from .QXBoxViewController import QXBoxViewController
@@ -28,45 +27,105 @@ class SecondWindow(QMainWindow):
         # self.setCentralWidget(self.view_sim)
         # self.setWindowTitle("Simulated scene")
 
-class EmittingStream(QtCore.QObject):
-    textWritten = QtCore.pyqtSignal(str)
+class EmittingStream(QObject):
+    textWritten = Signal(str)
     def write(self, text):
         self.textWritten.emit(str(text))
 
 class CustomDialog(QDialog):
-    def __init__(self,colortheme):
+    def __init__(self,colortheme,young_modulus,poisson_ratio,visual_flags,n_of_keypoints,max_distance,skip_images):
         super(CustomDialog, self).__init__()
-        # set initials values to widgets
+
+        ### initialize each tab as QWidget, then add Layout and Widgets to that QWidget
+        # first some general settings, so far only the option to switch between 
+        # 1) "fixed" view of the slam results plot and
+        # 2) following the estimated camera position based on the slam results, so the view should be similar to the real world view
         self.general_tab = QWidget()
-        self.general_tab_layout = QVBoxLayout()
+        self.general_tab_layout = QGridLayout()
+        self.follow_camera_checkbox = QCheckBox('Sync up SLAM Plot view and estimated camera position (does not work properly yet)')
+        self.follow_camera_checkbox.setChecked(False)
+        # change the number of simulation steps to be skipped before new screenshot is recorded for the SLAM
+        self.skip_images_label = QLabel('Number of simulation steps to be skipped before new SLAM step:')
+        self.skip_images_label_line_edit = QLineEdit(str(skip_images))
+        self.skip_images_label_line_edit.textChanged.connect(self.on_skip_images_changed)
+        self.skip_images = skip_images
+        # set layout etc.
         self.general_tab.setLayout(self.general_tab_layout)
+        self.general_tab_layout.addWidget(self.follow_camera_checkbox,0,0,1,2)
+        self.general_tab_layout.addWidget(self.skip_images_label,1,0,1,1)
+        self.general_tab_layout.addWidget(self.skip_images_label_line_edit,1,1)
 
-        self.slam_tab = QWidget()
-        self.slam_tab_layout = QVBoxLayout()
-        self.slam_tab.setLayout(self.slam_tab_layout)
-
+        ### SOFA TAB
         self.sofa_tab = QWidget()
-        self.sofa_tab_layout = QVBoxLayout()
+        self.sofa_tab_layout = QGridLayout()
+        # change young modulus of the simulated material
+        self.young_modulus_label = QLabel("Young's Modulus:")
+        self.young_modulus_line_edit = QLineEdit(str(young_modulus))
+        self.young_modulus_line_edit.textChanged.connect(self.on_young_modulus_changed)
+        self.young_modulus = young_modulus
+        # change poisson ratio of the simulated material
+        self.poisson_ratio_label = QLabel('Poisson Ratio:')
+        self.poisson_ratio_line_edit = QLineEdit(str(poisson_ratio))
+        self.poisson_ratio_line_edit.textChanged.connect(self.on_poisson_ratio_changed)
+        self.poisson_ratio = poisson_ratio
+        # sofa visual flags
+        self.visual_checkbox = QCheckBox('Visual')
+        self.visual_checkbox.setChecked(visual_flags[0])
+        self.collision_checkbox = QCheckBox('Collision')
+        self.collision_checkbox.setChecked(visual_flags[1])
+        self.behaviour_checkbox = QCheckBox('Behaviour')
+        self.behaviour_checkbox.setChecked(visual_flags[2])
+        self.force_fields_checkbox = QCheckBox('Force Fields')
+        self.force_fields_checkbox.setChecked(visual_flags[3])
+        # set layout etc.
+        self.sofa_tab_layout.addWidget(self.young_modulus_label,0,0,1,2)
+        self.sofa_tab_layout.addWidget(self.young_modulus_line_edit,0,2,1,2)
+        self.sofa_tab_layout.addWidget(self.poisson_ratio_label,1,0,1,2)
+        self.sofa_tab_layout.addWidget(self.poisson_ratio_line_edit,1,2,1,2)
+        self.sofa_tab_layout.addWidget(self.visual_checkbox,2,0,1,1)
+        self.sofa_tab_layout.addWidget(self.collision_checkbox,2,1,1,1)
+        self.sofa_tab_layout.addWidget(self.behaviour_checkbox,2,2,1,1)
+        self.sofa_tab_layout.addWidget(self.force_fields_checkbox,2,3,1,1)
+        self.sofa_tab_layout.setColumnStretch(0,1)
+        self.sofa_tab_layout.setColumnStretch(1,1)
+        self.sofa_tab_layout.setColumnStretch(2,1)
+        self.sofa_tab_layout.setColumnStretch(3,1)
         self.sofa_tab.setLayout(self.sofa_tab_layout)
 
+        ### NETWORKX TAB
         self.networkx_tab = QWidget()
-        self.networkx_tab_layout = QVBoxLayout()
+        self.networkx_tab_layout = QGridLayout()
+        # change the number of orb keypoints to use for the networkx graph, simulation gets slow for large values
+        self.n_of_keypoints_label = QLabel('Number of ORB features for graph extraction:')
+        self.n_of_keypoints_line_edit = QLineEdit(str(n_of_keypoints))
+        self.n_of_keypoints_line_edit.textChanged.connect(self.on_n_of_keypoints_changed)
+        self.n_of_keypoints = n_of_keypoints
+        # change the maximum distance betwenn two connected orb keypoints when extracting the graph, simulation gets slow for large values
+        self.max_distance_label = QLabel('Maximum distance for connection of features:')
+        self.max_distance_label_line_edit = QLineEdit(str(max_distance))
+        self.max_distance_label_line_edit.textChanged.connect(self.on_max_distance_changed)
+        self.max_distance = max_distance
+        # set layout etc.
+        self.networkx_tab_layout.addWidget(self.n_of_keypoints_label,0,0)
+        self.networkx_tab_layout.addWidget(self.n_of_keypoints_line_edit,0,1)
+        self.networkx_tab_layout.addWidget(self.max_distance_label,1,0)
+        self.networkx_tab_layout.addWidget(self.max_distance_label_line_edit,1,1)
         self.networkx_tab.setLayout(self.networkx_tab_layout)
 
-
+        # add tabs to tab-widget
         self.tab = QTabWidget()
         #tab.setTabPosition(QTabWidget.West)
-        self.tab.addTab(self.general_tab,'General')
-        self.tab.addTab(self.slam_tab,'SLAM')
+        self.tab.addTab(self.general_tab,'General/SLAM')
         self.tab.addTab(self.sofa_tab,'SOFA')
         self.tab.addTab(self.networkx_tab,'NetworkX')
 
+        # set layout for the window that contains the qtabwidget, add buttons, resize, ...
         self.main_layout = QVBoxLayout() # cannot set widget directly, so this layout just contains the QTabWidget
         self.main_layout.addWidget(self.tab)
         self.buttonBox = QDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
         self.buttonBox.accepted.connect(self.accept)
-        self.buttonBox.rejected.connect(self.rejected)
+        self.buttonBox.rejected.connect(self.reject)
         self.main_layout.addWidget(self.buttonBox)
         self.setLayout(self.main_layout)
         self.resize(640,360)
@@ -74,6 +133,46 @@ class CustomDialog(QDialog):
             self.setStyleSheet(qdarkstyle.load_stylesheet(qdarkstyle.dark.palette.DarkPalette))
         else:
             self.setStyleSheet(qdarkstyle.load_stylesheet(qdarkstyle.light.palette.LightPalette))
+
+    def get_is_following_camera(self):
+        return self.follow_camera_checkbox.isChecked()
+
+    def on_skip_images_changed(self,text):
+        self.skip_images = int(float(text))
+
+    def get_skip_images(self):
+        return self.skip_images
+
+    def on_young_modulus_changed(self,text):
+        self.young_modulus = float(text)
+    
+    def get_young_modulus(self):
+        return self.young_modulus
+    
+    def on_poisson_ratio_changed(self,text):
+        self.poisson_ratio = float(text)
+    
+    def get_poisson_ratio(self):
+        return self.poisson_ratio
+
+    def get_visual_flags(self):
+        return [self.visual_checkbox.isChecked(),
+                 self.collision_checkbox.isChecked(), 
+                 self.behaviour_checkbox.isChecked(), 
+                 self.force_fields_checkbox.isChecked()]
+
+    def on_n_of_keypoints_changed(self,text):
+        self.n_of_keypoints = int(float(text)) 
+
+    def get_n_of_keypoints(self):
+        return self.n_of_keypoints
+    
+    def on_max_distance_changed(self,text):
+        self.max_distance = int(float(text))
+
+    def get_max_distance(self):
+        return self.max_distance
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -108,13 +207,16 @@ class MainWindow(QMainWindow):
         
 
         # font and background settings, stylesheets
-        self.font_size = 20
-        self.font = 'Helvetica'
-        self.background_color = 'black'
-        self.text_color = 'white'
+        #self.font_size = 20
+        #self.font = 'Helvetica'
+        #self.background_color = 'black'
+        #self.text_color = 'white'
         self.colortheme = 'dark'
         self.buttonstyle_not_clicked = 'QPushButton {color:white}'
         self.buttonstyle_clicked = 'QPushButton {color:red}'
+        self.visual_flags = [True,False,False,False] # intially only show visual model
+        self.n_of_keypoints = 200
+        self.max_distance = 100 # in pixels
         
 
         ### maybe add sofa_view seperately once real camera_data is used
@@ -144,6 +246,7 @@ class MainWindow(QMainWindow):
         self.slam_results_plot.opts['elevation'] = -65          ## camera's angle of elevation in degrees
         self.slam_results_plot.opts['azimuth'] = 30            ## camera's azimuthal angle in degrees 
         self.slam_results_plot.pan(dx=0,dy=0,dz=0.3,relative='global')
+        self.is_following_camera = False # flag for the plot function, changes based on getter-function from the settings dialog
 
         # add graphics window to layout, this widget consists of...
         # ...viewbox, which consist of...
@@ -172,13 +275,13 @@ class MainWindow(QMainWindow):
         #self.text_edit_console.setAlignment(Qt.AlignCenter)
         #self.text_edit_console.setFont(QFont(self.font, 14))
         print('Welcome to SLAM Dashboard!')
+        print("When starting the simulation the camera follows the keypoint-navigation specified in '/trajectories/navigation/keypoints1b.txt'. After that you can move around using the w-a-s-d and arrowkeys!")
 
         # button to start/stop the simulation
         self.sim_start_button = QPushButton("Start Simulation")
         self.sim_start_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.sim_start_button.clicked.connect(self.on_click_button_sim_start)
         
-
         # button to start/stop slam
         self.slam_start_button = QPushButton("Start SLAM")
         self.slam_start_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -190,19 +293,18 @@ class MainWindow(QMainWindow):
         self.settings_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.settings_button.clicked.connect(self.on_click_button_settings)
 
-        # slider to adjust volume of the sofa object
-        # TODO actually add cavity and sofa controller functions
+        # slider to adjust volume/pressure of the sofa object causing it to deform
         self.slider_frame = QFrame()
-        self.slider_hbox = QHBoxLayout()
+        self.slider_hbox = QVBoxLayout()
         self.slider_frame.setLayout(self.slider_hbox)
         self.volume_slider = QSlider(Qt.Horizontal, self)
-        self.volume_slider.setRange(0,100)
-        self.volume_slider.setValue(33)
+        self.volume_slider.setRange(0.5,200)
+        self.volume_slider.setValue(1)
         self.volume_slider.setFocusPolicy(Qt.NoFocus)
         self.volume_slider.setPageStep(1)
         self.volume_slider.valueChanged.connect(self.on_value_changed_slider)
         self.slider_label = QLabel()
-        self.slider_label.setText('SOFA object cavity')
+        self.slider_label.setText('SOFA deformation')
         self.slider_label.setAlignment(Qt.AlignCenter)
         self.slider_hbox.addWidget(self.slider_label)
         self.slider_hbox.addWidget(self.volume_slider)
@@ -215,7 +317,7 @@ class MainWindow(QMainWindow):
         self.colormode_checkbox.setText('Darkmode')
         self.colormode_checkbox.setChecked(True)
         self.colormode_checkbox.stateChanged.connect(self.on_colormode_checkbox_change)
-        self.checkbox_layout = QHBoxLayout()
+        self.checkbox_layout = QVBoxLayout()
         self.checkbox_layout.addWidget(self.networkx_checkbox)
         self.checkbox_layout.addWidget(self.colormode_checkbox)
 
@@ -228,6 +330,12 @@ class MainWindow(QMainWindow):
         self.options_layout.addWidget(self.slider_frame)
         self.options_layout.addLayout(self.checkbox_layout)
         self.options_layout.addWidget(self.text_edit_console)
+        self.options_layout.setStretch(0,1)
+        self.options_layout.setStretch(1,1)
+        self.options_layout.setStretch(2,1)
+        self.options_layout.setStretch(3,2)
+        self.options_layout.setStretch(4,1)
+        self.options_layout.setStretch(5,2)
         self.options_frame = QFrame()
         self.options_frame.setLayout(self.options_layout)
 
@@ -259,16 +367,17 @@ class MainWindow(QMainWindow):
         self.feature_graph_dockWidget.setTitleBarWidget(QLabel(''))
         self.feature_graph_dockWidget.setWindowTitle('Feature Graph Plot')
 
-
         # create QWidget to contain the first level grid layout, set as central widget in main window
         self.widget = QWidget()
         self.view_layout = QVBoxLayout()
         self.view_layout.addWidget(self.view_real)
+        self.view_layout.setContentsMargins(0,0,0,0)
         self.widget.setLayout(self.view_layout)
         self.setCentralWidget(self.widget)
         #self.setCentralWidget(self.view_real)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         
+        # add the dock widgets, options on the top, plots tabified on the right
         self.addDockWidget(Qt.TopDockWidgetArea,self.options_dockWidget)
         self.addDockWidget(Qt.RightDockWidgetArea,self.slam_plot_dockWidget)
         self.addDockWidget(Qt.RightDockWidgetArea,self.feature_graph_dockWidget)
@@ -283,10 +392,7 @@ class MainWindow(QMainWindow):
 
         # for some weird reason this needs to be added later else python crashes on my mac (only true for GLScatterPlotItem and GLImageItem)
         self.slam_results_plot.addItem(self.worldpoint_plot)
-        # TODO change initial view of plot, maybe update automatically based on slam results
         # TODO add legend to plots
-        #self.slam_results_plot.orbit(0, 1.5708)
-        #self.slam_results_plot.pan(0.0,0.0,0.0,relative='global')
         
         # initialize matlab engine and slam tracking/mapping the real world
         current_dir = os.path.dirname(__file__)
@@ -305,19 +411,20 @@ class MainWindow(QMainWindow):
     def resize_widgets(self):
         self.screen_height = self.height()
         self.screen_width = self.width()
-        print('Window is ' + str(self.screen_width) + 'x' + str(self.screen_height))
+        print('Window size: ' + str(self.screen_width) + 'x' + str(self.screen_height))
         # self.options_frame.setFixedSize(1920,120)
         # self.options_dockWidget.setFixedSize(1920,120)
         # self.view_real.setMaximumSize(960,960)
         # self.view_real.setMinimumHeight(960)
         # self.slam_results_plot.resize(960,960)
         # self.feature_graph_window.resize(960,960)
-        self.options_frame.setFixedSize(self.screen_width,self.screen_height//9)
-        self.options_dockWidget.setFixedSize(self.screen_width,self.screen_height//9)
-        self.view_real.setMaximumSize(self.screen_width//2,self.screen_height-self.screen_height//9)
-        self.view_real.setMinimumHeight(self.screen_height-self.screen_height//9)
-        self.slam_results_plot.resize(self.screen_width//2,self.screen_height-self.screen_height//9)
-        self.feature_graph_window.resize(self.screen_width//2,self.screen_height-self.screen_height//9)
+        self.widget.setFixedSize(self.screen_width/2,self.screen_height-120)
+        self.options_frame.setBaseSize(self.screen_width,120)
+        self.options_dockWidget.setBaseSize(self.screen_width,120)
+        #self.options_frame.setMinimumHeight(120)
+        #self.options_dockWidget.setMinimumHeight(120)
+        self.slam_results_plot.resize(self.screen_width/2,self.screen_height-120)
+        self.feature_graph_window.resize(self.screen_width/2,self.screen_height-120)
 
     def keyPressEvent(self, QKeyEvent):
         if QKeyEvent.key() == Qt.Key_Space:
@@ -329,8 +436,8 @@ class MainWindow(QMainWindow):
                 self.real_world.start_sim()
                 self.sofa_sim.start_sim()
         if QKeyEvent.key() == Qt.Key_P:
-            print(self.slam_results_plot.cameraPosition())
             print(self.view_real.get_viewer_size())
+            self.image_item.setImage(self.view_real.get_screen_shot())
 
     def on_click_button_sim_start(self):
         if self.real_world.is_animating:
@@ -365,31 +472,46 @@ class MainWindow(QMainWindow):
             self.slam_start_button.setStyleSheet(self.buttonstyle_clicked)
     
     def on_click_button_settings(self):
-        w = CustomDialog(self.colortheme)
-        w.exec()
+        # open custom dialog when settings button is clicked
+        settings_dialog = CustomDialog(colortheme=self.colortheme,
+                                    young_modulus=self.real_world.root.ellipsoid.fem.youngModulus.value[0],
+                                    poisson_ratio=self.real_world.root.ellipsoid.fem.poissonRatio.value,
+                                    visual_flags=self.visual_flags,
+                                    n_of_keypoints=self.n_of_keypoints,
+                                    max_distance=self.max_distance,
+                                    skip_images=self.mat_engine.skip_images_main)
+        # if dialog is accepted (ok clicked) then get all the relevant values via getter-functions
+        if settings_dialog.exec_() == QDialog.Accepted:
+            self.is_following_camera = settings_dialog.get_is_following_camera()
+            self.mat_engine.skip_images_main = settings_dialog.get_skip_images()
+            self.real_world.root.ellipsoid.fem.youngModulus.value = [settings_dialog.get_young_modulus()]
+            self.real_world.root.ellipsoid.fem.poissonRatio.value = settings_dialog.get_poisson_ratio()
+            self.visual_flags = settings_dialog.get_visual_flags() # [visual, collision, behavior, forcefields]
+            flags_strings = [['hideVisual','showVisual'],
+                            ['hideCollisionModels','showCollisionModels'],
+                            ['hideBehaviorModels','showBehaviorModels'],
+                            ['hideForceFields','showForceFields']]
+            flag_string = ''
+            i = 0
+            for flag in self.visual_flags:
+                flag_string = flag_string + ' ' + flags_strings[i][int(flag==True)]
+                i += 1
+            self.real_world.root.VisualStyle.displayFlags=flag_string
+            self.n_of_keypoints = settings_dialog.get_n_of_keypoints()
+            self.max_distance = settings_dialog.get_max_distance()
 
     def on_value_changed_slider(self,value):
-        # self.volume_slider.setStyleSheet(\
-        # "QSlider::groove:horizontal {\
-        # border: 1px solid #999999;\
-        # height: 8px; \
-        # background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:2, y2:0, "+get_groove_color(color_range)+");\
-        # margin: -4px 0;\
-        # border-radius: 4px\
-        # }QSlider::handle:horizontal {\
-        # background-color: black;\
-        # border: 1px solid #5c5c5c;\
-        # border-color: white;\
-        # border-radius:" + str(value//11+4) +"px;\
-        # width:" + str(value//5+8) +"px;\
-        # margin: -" + str(value//14+2) +"px 0;\
-        # }\
-        # QSlider{border-width:0px}")
-        return 0
+        #pressure = self.real_world.root.ellipsoid.surfaceConstraint.pressure.value
+        self.real_world.root.ellipsoid.surfaceConstraint.pressure.value = value
+        # probably do this for the sim as well in the future (right now only the sim that is supposed to be the real world)
     
     def extract_network(self):
         # TODO skip_counter
-        nxs.draw_img_and_graph(image_item=self.image_item, image=self.view_real.get_screen_shot(), graph_item=self.graph_item)
+        nxs.draw_img_and_graph(image_item=self.image_item, 
+                            image=self.view_real.get_screen_shot(), 
+                            graph_item=self.graph_item, 
+                            n_of_keypoints=self.n_of_keypoints,
+                            max_distance=self.max_distance)
 
     def on_networkx_checkbox_change(self):
         if self.mat_engine.is_extracting_graph:
@@ -426,7 +548,7 @@ class MainWindow(QMainWindow):
         """Append text to the QTextEdit."""
         # Maybe QTextEdit.append() works as well, but this is how I do it:
         cursor = self.text_edit_console.textCursor()
-        cursor.movePosition(QtGui.QTextCursor.End)
+        cursor.movePosition(QTextCursor.End)
         cursor.insertText(text)
         self.text_edit_console.setTextCursor(cursor)
 

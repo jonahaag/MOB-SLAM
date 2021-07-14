@@ -88,6 +88,16 @@ class SofaSim(QObject):
                              template="Vec3d", indices="@PairBox.indices", meshIndices = "@boxROI.indices",
                              translation=[0.0,0.0,0.0], rotation=[1, 0, 0, 0, 1, 0, 0, 0, 1])
 
+        # cavity = ellipsoid.addChild('cavity')
+        # #cavity.createObject('MeshGmshLoader', name='loader', filename='geometry/inner_sphere.msh', scale= '60')
+        # cavity.addObject('MeshSTLLoader', name='loader', filename=stlFilename, scale=0.9)
+        # cavity.addObject('Mesh', src='@loader', name='topo')
+        # cavity.addObject('MechanicalObject', name='cavity')
+        # #cavity.createObject('SurfacePressureConstraint', name="surfaceConstraint", triangles='@topo.triangles', valueType="volumeGrowth")
+        # # We need to use a BarycentricMapping to map the deformation of the cavity onto our 3d Mesh
+        # cavity.addObject('BarycentricMapping', name='mapping',  mapForces='false', mapMasses='false')
+        ellipsoid.addObject('SurfacePressureForceField',name='surfaceConstraint', pressure=1)
+
         # place light and a camera
         #self.root.addObject("BackgroundSetting", color=[25/255,35/255,45/255,1.0])
         self.root.addObject("LightManager")

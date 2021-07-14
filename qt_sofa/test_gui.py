@@ -1,7 +1,7 @@
 from qtpy.QtCore import *
 from qtpy.QtWidgets import *
 from qtpy.QtGui import *
-from PyQt5 import QtCore, QtGui
+#from PyQt5 import QtCore, QtGui
 import os
 import pyqtgraph as pg
 import pyqtgraph.widgets
@@ -54,10 +54,8 @@ class CustomDialog(QDialog):
         self.resize(640,360)
         self.setStyleSheet(qdarkstyle.load_stylesheet(qdarkstyle.dark.palette.DarkPalette))
         
-
-
-class EmittingStream(QtCore.QObject):
-    textWritten = QtCore.pyqtSignal(str)
+class EmittingStream(QObject):
+    textWritten = Signal(str)
     def write(self, text):
         self.textWritten.emit(str(text))
 
@@ -340,7 +338,7 @@ class MainWindow(QMainWindow):
         """Append text to the QTextEdit."""
         # Maybe QTextEdit.append() works as well, but this is how I do it:
         cursor = self.text_edit_console.textCursor()
-        cursor.movePosition(QtGui.QTextCursor.End)
+        cursor.movePosition(QTextCursor.End)
         cursor.insertText(text)
         self.text_edit_console.setTextCursor(cursor)
 

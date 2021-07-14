@@ -13,7 +13,7 @@ import datetime
 from Widgets import ssc
 from random import shuffle
 
-def extract_feature_graph(img_rgb):
+def extract_feature_graph(img_rgb, n_of_keypoints, max_distance):
     # convert rgb image to greyscale
     img = np.dot(img_rgb[...,:3], [0.299, 0.587, 0.114])
     img = cv.normalize(src=img, dst=None, alpha=0, beta=255, norm_type=cv.NORM_MINMAX, dtype=cv.CV_8U)
@@ -27,7 +27,7 @@ def extract_feature_graph(img_rgb):
     shuffle(kp)  # simulating sorting by score with random shuffle
 
     selected_keypoints = ssc.ssc(
-        kp, 200, 0.01, img.shape[1], img.shape[0]
+        kp, n_of_keypoints, 0.01, img.shape[1], img.shape[0]
     )
 
     # draw only keypoints location,not size and orientation
@@ -39,18 +39,18 @@ def extract_feature_graph(img_rgb):
         G.add_node(i,pos=selected_keypoints[i].pt)
         # add edge between every node
         for j in range(0,i):
-            if math.sqrt((pts[i][0]-pts[j][0])**2+(pts[i][1]-pts[j][1])**2) <= 100:
+            if math.sqrt((pts[i][0]-pts[j][0])**2+(pts[i][1]-pts[j][1])**2) <= max_distance:
                 G.add_edge(i,j)
     
     # return keypoint positions (2D), orb descriptors, and feature graph
     return selected_keypoints, pts, descriptors, G
 
-def draw_img_and_graph(image_item, image, graph_item):
+def draw_img_and_graph(image_item, image, graph_item, n_of_keypoints, max_distance):
     #image_item.setImage(np.dot(image[...,:3], [0.299, 0.587, 0.114]))
     image_item.setImage(image)
-    kp, pts, descriptors, G = extract_feature_graph(image)
+    kp, pts, descriptors, G = extract_feature_graph(image, n_of_keypoints, max_distance)
     edges = np.array([list(edge) for edge in nx.edges(G)])
-    graph_item.setData(pos=pts,adj=edges,pxMode=True,size=5.0,brush='k',pen='w')
+    graph_item.setData(pos=pts,adj=edges,pxMode=True,size=7.0,brush='r',pen='y')
 
 # def plot_feature_graph_onto_image(img, kp, G):
 #     img_with_kp = cv.drawKeypoints(img,kp,outImage=None,color=(0,255,0),flags=0)

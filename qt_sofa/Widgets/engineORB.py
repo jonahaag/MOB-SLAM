@@ -211,7 +211,9 @@ class EngineORB:
             srp.plot_slam_results(worldpoint_plot=self.main_window.worldpoint_plot, 
                                   cam_pos_plot=self.main_window.cam_pos_plot,
                                   worldpoints=np.array(list(self.mat.workspace['worldpoints'])), 
-                                  camera_positions=np.array(list(self.mat.workspace['camera_positions'])))
+                                  camera_positions=np.array(list(self.mat.workspace['camera_positions'])),
+                                  slam_results_plot=self.main_window.slam_results_plot,
+                                  follow_camera=self.main_window.is_following_camera)
              
     def stop_slam(self):
         # save ground truth of key frames as mat-file
@@ -358,6 +360,12 @@ class EngineORB:
             else:
                 self.build_network = False
                 print("Stop Network")
+
+        if QKeyEvent.key() == Qt.Key_L:
+            pressure = self.real_world.root.ellipsoid.surfaceConstraint.pressure.value
+            self.real_world.root.ellipsoid.surfaceConstraint.pressure.value = pressure + 1
+            #print(self.real_world.root.ellipsoid.cavity.surfaceConstraint.pressure)
+            #print(self.real_world.root.ellipsoid.cavity.surfaceConstraint.pressure.value)
     
     def update_slam(self):
         # at every animation_end-event, either do nothing or pass image
