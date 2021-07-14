@@ -47,13 +47,16 @@ class CustomDialog(QDialog):
         # change the number of simulation steps to be skipped before new screenshot is recorded for the SLAM
         self.skip_images_label = QLabel('Number of simulation steps to be skipped before new SLAM step:')
         self.skip_images_label_line_edit = QLineEdit(str(skip_images))
+        self.skip_images_label_line_edit.setAlignment(Qt.AlignRight)
         self.skip_images_label_line_edit.textChanged.connect(self.on_skip_images_changed)
         self.skip_images = skip_images
         # set layout etc.
-        self.general_tab.setLayout(self.general_tab_layout)
         self.general_tab_layout.addWidget(self.follow_camera_checkbox,0,0,1,2)
         self.general_tab_layout.addWidget(self.skip_images_label,1,0,1,1)
         self.general_tab_layout.addWidget(self.skip_images_label_line_edit,1,1)
+        self.general_tab_layout.setColumnStretch(0,4)
+        self.general_tab_layout.setColumnStretch(1,1)
+        self.general_tab.setLayout(self.general_tab_layout)
 
         ### SOFA TAB
         self.sofa_tab = QWidget()
@@ -61,11 +64,13 @@ class CustomDialog(QDialog):
         # change young modulus of the simulated material
         self.young_modulus_label = QLabel("Young's Modulus:")
         self.young_modulus_line_edit = QLineEdit(str(young_modulus))
+        self.young_modulus_line_edit.setAlignment(Qt.AlignRight)
         self.young_modulus_line_edit.textChanged.connect(self.on_young_modulus_changed)
         self.young_modulus = young_modulus
         # change poisson ratio of the simulated material
         self.poisson_ratio_label = QLabel('Poisson Ratio:')
         self.poisson_ratio_line_edit = QLineEdit(str(poisson_ratio))
+        self.poisson_ratio_line_edit.setAlignment(Qt.AlignRight)
         self.poisson_ratio_line_edit.textChanged.connect(self.on_poisson_ratio_changed)
         self.poisson_ratio = poisson_ratio
         # sofa visual flags
@@ -98,11 +103,13 @@ class CustomDialog(QDialog):
         # change the number of orb keypoints to use for the networkx graph, simulation gets slow for large values
         self.n_of_keypoints_label = QLabel('Number of ORB features for graph extraction:')
         self.n_of_keypoints_line_edit = QLineEdit(str(n_of_keypoints))
+        self.n_of_keypoints_line_edit.setAlignment(Qt.AlignRight)
         self.n_of_keypoints_line_edit.textChanged.connect(self.on_n_of_keypoints_changed)
         self.n_of_keypoints = n_of_keypoints
         # change the maximum distance betwenn two connected orb keypoints when extracting the graph, simulation gets slow for large values
         self.max_distance_label = QLabel('Maximum distance for connection of features:')
         self.max_distance_label_line_edit = QLineEdit(str(max_distance))
+        self.max_distance_label_line_edit.setAlignment(Qt.AlignRight)
         self.max_distance_label_line_edit.textChanged.connect(self.on_max_distance_changed)
         self.max_distance = max_distance
         # set layout etc.
@@ -110,6 +117,8 @@ class CustomDialog(QDialog):
         self.networkx_tab_layout.addWidget(self.n_of_keypoints_line_edit,0,1)
         self.networkx_tab_layout.addWidget(self.max_distance_label,1,0)
         self.networkx_tab_layout.addWidget(self.max_distance_label_line_edit,1,1)
+        self.networkx_tab_layout.setColumnStretch(0,4)
+        self.networkx_tab_layout.setColumnStretch(1,1)
         self.networkx_tab.setLayout(self.networkx_tab_layout)
 
         # add tabs to tab-widget
