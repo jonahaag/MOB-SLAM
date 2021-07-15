@@ -2,7 +2,7 @@
 MobSLAM is a Simultaneous Localization and Mapping system for deformable environments
 
 # WHATS NEW
-A lot of things were changed/added to the GUI to improve user experience:
+A small overview of recent changes of the GUI to improve user experience:
 1. Docker Widget Layout consisting of: 
 - Options bar at the top (fixed position and size)
 - Sofa GL Viewer showing the simulation on the left side (right now also fixed position and size)
