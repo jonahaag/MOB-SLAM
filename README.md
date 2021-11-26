@@ -4,14 +4,20 @@ MobSLAM is a Simultaneous Localization and Mapping system for deformable environ
 This repository contains a graphical user interface that enables 
 
 - the display of a [SOFA simulation](https://www.sofa-framework.org)
+- different options to record and select different paths as well as a keyboard controller for the simulation camera
+- different options to deform the simulated object
 - use of a Simultaneous Localization and Mapping (SLAM) algorithm to 
 	1. track the camera movement within the simulation 
 	2. generate a map of the scene
-- 
+	3. incorporate deformation information based on the parallel simulation
+	
+It is designed to be modular and easily extensible and aims at providing a reliable and replicable code base for future work on this topic.
 
 The model-based approach enables the SLAM algorithm to produce good results even in the presence of deformations e.g. caused by external forces or changes in volume.
 The aim of this work is to provide a more reliable geometric representation of deformable structures based on a monocular camera by directly incorporating information about the deformation into the mapping.
-The basic idea is to run a parallel FEM simulation predicting the deforation based on measurements and then use the simulated surface information, i.e. vertex positions, to continuously update the SLAM results.
+The basic idea is to run a parallel FEM simulation predicting the deformation based on measurements and then use the simulated surface information, i.e. vertex positions, to continuously update the SLAM results.
+At this stage there is no distinction between the "real world" and the simulation which basically equals perfect predictions of the deformation.
+This is obviously almost impossible to achieve in real life which is why the interface is designed to easily separate between the two views - more information on this can be found below.
 This repository was created as part of the research area B1 concerning [Intraoperative Navigation of Multimodal sensors](https://www.grk2543.uni-stuttgart.de/en/research/b-modeling-and-classification/b1-modeling/) of the [RTG 2543: Intraoperative Multisensory Tissue Differentiation in Oncology](https://www.grk2543.uni-stuttgart.de/en/) at the [Institute for System Dynamics (ISYS)](https://www.isys.uni-stuttgart.de/en/), University of Stuttgart, Germany.
 
 It builds on top of [QSofaGLViewTools](https://github.com/psomers3/QSofaGLViewTools) and [MATLAB Monocular Visual Simultaneous Localization and Mapping](https://www.mathworks.com/help/vision/ug/monocular-visual-simultaneous-localization-and-mapping.html).
