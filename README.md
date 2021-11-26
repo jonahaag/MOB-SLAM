@@ -1,7 +1,22 @@
-# Model_based_SLAM
-MobSLAM is a Simultaneous Localization and Mapping system for deformable environments
+# Model-based SLAM GUI
 
-# WHATS NEW
+MobSLAM is a Simultaneous Localization and Mapping system for deformable environments.
+This repository contains a graphical user interface that enables 
+
+- the display of a [SOFA simulation](https://www.sofa-framework.org)
+- use of a Simultaneous Localization and Mapping (SLAM) algorithm to 
+	1. track the camera movement within the simulation 
+	2. generate a map of the scene
+- 
+
+The model-based approach enables the SLAM algorithm to produce good results even in the presence of deformations e.g. caused by external forces or changes in volume.
+The aim of this work is to provide a more reliable geometric representation of deformable structures based on a monocular camera by directly incorporating information about the deformation into the mapping.
+The basic idea is to run a parallel FEM simulation predicting the deforation based on measurements and then use the simulated surface information, i.e. vertex positions, to continuously update the SLAM results.
+This repository was created as part of the research area B1 concerning [Intraoperative Navigation of Multimodal sensors](https://www.grk2543.uni-stuttgart.de/en/research/b-modeling-and-classification/b1-modeling/) of the [RTG 2543: Intraoperative Multisensory Tissue Differentiation in Oncology](https://www.grk2543.uni-stuttgart.de/en/) at the [Institute for System Dynamics (ISYS)](https://www.isys.uni-stuttgart.de/en/), University of Stuttgart, Germany.
+
+It builds on top of [QSofaGLViewTools](https://github.com/psomers3/QSofaGLViewTools) and [MATLAB Monocular Visual Simultaneous Localization and Mapping](https://www.mathworks.com/help/vision/ug/monocular-visual-simultaneous-localization-and-mapping.html).
+
+## Repository overview
 A small overview of recent changes of the GUI to improve user experience:
 
 1. Docker Widget Layout consisting of: 
@@ -14,7 +29,7 @@ A small overview of recent changes of the GUI to improve user experience:
 3. Slider to deform the Sofa object and possibly test future versions of the Model-based approach
 4. Settings Dialog with some initial ideas regarding what might be interesting to play around with, some visual settings
 
-# Prerequisites
+## Prerequisites
 
 1. Sofa Python3 bindings
 2. qtpy, PyQt5
@@ -23,9 +38,8 @@ A small overview of recent changes of the GUI to improve user experience:
 5. cv2
 6. qdarkstyle
 
-# Troubleshooting
+## How to get going / Demo / Tutorial
 
-If the SLAM does not produce the expected results, most likely the get_screenshot function of SofaGLViewer.py does not work properly. 
-To check, please check the 'Extract Networkx Graph'  checkbox and compare the images in the Feature Graph Plot to the GL Viewer (what you see in the simulation).
-This is easier in Light Mode since then the frame of the Feature Graph Plot is visible (the image is shown smaller).
-If the shown image does not match the viewer, please let me know.
+## Docker container
+
+## Further resources
