@@ -1,4 +1,4 @@
-# Model-based SLAM GUI
+# Model-based SLAM
 
 MobSLAM is a Simultaneous Localization and Mapping system for deformable environments.
 This repository contains a graphical user interface that enables 
