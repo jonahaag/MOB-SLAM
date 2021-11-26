@@ -1,19 +1,19 @@
-from qtpy.QtCore import *
-from qtpy.QtWidgets import *
-from qtpy.QtGui import *
-from .SofaGLViewer import SofaGLViewer
-from .SofaSim import SofaSim
-from .QXBoxViewController import QXBoxViewController
-from .QSofaViewKeyboardController import QSofaViewKeyboardController
-from .engineORB import EngineORB
-import os
-import pyqtgraph as pg
-import pyqtgraph.widgets
-import pyqtgraph.opengl as gl
-import numpy as np
-import sys
-from Widgets import NetworkSLAM as nxs
-import qdarkstyle
+# from qtpy.QtCore import *
+# from qtpy.QtWidgets import *
+# from qtpy.QtGui import *
+# from SofaViewer.Widgets.SofaGLViewer import SofaGLViewer
+# from SofaViewer.Widgets.SofaSim import SofaSim
+# # from SofaViewer.Widgets.QXBoxViewController import QXBoxViewController
+# from SofaViewer.Widgets.QSofaViewKeyboardController import QSofaViewKeyboardController
+# from GUI.EngineORB import EngineORB
+# from FeatureGraph import NetworkSLAM as nxs
+# import os
+# import pyqtgraph as pg
+# import pyqtgraph.widgets
+# import pyqtgraph.opengl as gl
+# import numpy as np
+# import sys
+# import qdarkstyle
 #sys.path.append("Widgets")
 #import NetworkSLAM as nxs
 #import networkx as nx
