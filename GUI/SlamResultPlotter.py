@@ -1,7 +1,3 @@
-import pyqtgraph as pg
-import pyqtgraph.opengl as gl
-import networkx as nx
-import numpy as np
 import math
 
 def plot_slam_results(worldpoint_plot, cam_pos_plot, worldpoints, camera_positions, slam_results_plot, follow_camera):

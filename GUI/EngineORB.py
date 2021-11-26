@@ -5,26 +5,18 @@ Created on Mon Feb 22 11:55:53 2021
 
 @author: jona
 """
-from Widgets.NetworkSLAM import extract_feature_graph
-from ctypes import sizeof
 from qtpy.QtCore import *
 from qtpy.QtWidgets import *
 import matlab.engine
 import numpy as np
 from scipy.io import savemat
-from .SofaGLViewer import SofaGLViewer
-from .SofaSim import SofaSim
+from SofaViewer.Widgets.SofaGLViewer import SofaGLViewer
+from SofaViewer.Widgets.SofaSim import SofaSim
 import csv
 import os
 import math
-from Widgets import NetworkSLAM as nxs
-from Widgets import SlamResultPlotter as srp
-#import sys
-#sys.path.append("Widgets")
-#import NetworkSLAM as nxs
-#import SlamResultPlotter as srp
+from GUI import SlamResultPlotter as srp
 import cv2
-
 
 def compute_trajectory(keypoints):
     # get list of keytimes and corresponding positions/orientations
@@ -48,7 +40,6 @@ def compute_trajectory(keypoints):
         orientations[time_0:time_1+1,:] = (time_n-time_0) * (ori_1-ori_0)/(time_1-time_0) + ori_0
         orientations = orientations / np.linalg.norm(orientations, axis=1, keepdims=True) 
     return positions, orientations
-
 
 class EngineORB:
    
@@ -400,5 +391,3 @@ class EngineORB:
         self.sofa_sim.root.camera.position = self.cam_pos
         self.sofa_sim.root.camera.orientation = self.cam_ori
         
-
-

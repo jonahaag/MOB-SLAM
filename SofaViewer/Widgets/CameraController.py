@@ -1,7 +1,6 @@
 import Sofa
 import Sofa.Core
 from Sofa.constants import *
-import math
 
 
 class controller(Sofa.Core.Controller):

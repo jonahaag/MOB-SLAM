@@ -9,8 +9,7 @@ import numpy as np
 import networkx as nx
 import cv2 as cv
 import math
-import datetime
-from Widgets import ssc
+from FeatureGraph import ssc
 from random import shuffle
 
 def extract_feature_graph(img_rgb, n_of_keypoints, max_distance):
