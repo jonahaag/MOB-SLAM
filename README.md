@@ -26,10 +26,9 @@ It builds on top of [QSofaGLViewTools](https://github.com/psomers3/QSofaGLViewTo
 A small overview of recent changes of the GUI to improve user experience:
 
 1. Docker Widget Layout consisting of: 
-
-- Options bar at the top (fixed position and size)
-- Sofa GL Viewer showing the simulation on the left side (right now also fixed position and size)
-- SLAM Results Plot and Feature Graph Plot as a Tab Widgets (can be undocked and resized, design to be improved). Double click on the top of the widget to (un)dock or drag and drop
+	- Options bar at the top (fixed position and size)
+	- Sofa GL Viewer showing the simulation on the left side (right now also fixed position and size)
+	- SLAM Results Plot and Feature Graph Plot as a Tab Widgets (can be undocked and resized, design to be improved). Double click on the top of the widget to (un)dock or drag and drop
 
 2. Light Mode / Dark Mode with qdarkstyle, though some things need to be improved
 3. Slider to deform the Sofa object and possibly test future versions of the Model-based approach
