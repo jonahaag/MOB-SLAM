@@ -30,7 +30,7 @@ class CustomDialog(QDialog):
         n_of_keypoints,
         max_distance,
         skip_images_slam,
-        skip_images_network
+        skip_images_network,
     ):
         super(CustomDialog, self).__init__()
 
@@ -138,7 +138,9 @@ class CustomDialog(QDialog):
         self.networkx_tab_layout.addWidget(self.max_distance_label, 1, 0)
         self.networkx_tab_layout.addWidget(self.max_distance_label_line_edit, 1, 1)
         self.general_tab_layout.addWidget(self.skip_images_network_label, 2, 0, 1, 1)
-        self.general_tab_layout.addWidget(self.skip_images_network_label_line_edit, 2, 1)
+        self.general_tab_layout.addWidget(
+            self.skip_images_network_label_line_edit, 2, 1
+        )
         self.networkx_tab_layout.setColumnStretch(0, 4)
         self.networkx_tab_layout.setColumnStretch(1, 1)
         self.networkx_tab.setLayout(self.networkx_tab_layout)
@@ -300,7 +302,7 @@ class MainWindow(QMainWindow):
         self.slam_results_plot.opts["fov"] = 60
         # camera's angle of elevation in degrees
         self.slam_results_plot.opts["elevation"] = -65
-        # camera's azimuthal angle in degrees 
+        # camera's azimuthal angle in degrees
         self.slam_results_plot.opts["azimuth"] = 30
         self.slam_results_plot.pan(dx=0, dy=0, dz=0.3, relative="global")
         # flag for the plot function, changes based on getter-function from the settings dialog
@@ -439,14 +441,14 @@ class MainWindow(QMainWindow):
             self.main_grid.setRowStretch(0, 1)
             self.main_grid.setRowStretch(1, 5)
             self.main_grid.setRowStretch(2, 5)
-            self.main_grid.setColumnStretch(0,1)
-            self.main_grid.setColumnStretch(1,1)
-            self.main_grid.addWidget(self.options_frame,0,0,1,2)
+            self.main_grid.setColumnStretch(0, 1)
+            self.main_grid.setColumnStretch(1, 1)
+            self.main_grid.addWidget(self.options_frame, 0, 0, 1, 2)
             self.main_grid.addWidget(self.view_real, 1, 0)
             self.main_grid.addWidget(self.view_sim, 2, 0)
             self.main_grid.addWidget(self.slam_results_plot, 1, 1)
             self.main_grid.addWidget(self.feature_graph_window, 2, 1)
-            self.main_grid.setContentsMargins(0,0,0,0)
+            self.main_grid.setContentsMargins(0, 0, 0, 0)
             self.main_grid.setSpacing(1)
 
             # create QWidget to contain the first level grid layout, set as central widget in main window
@@ -490,7 +492,9 @@ class MainWindow(QMainWindow):
             # add the dock widgets, options on the top, plots tabified on the right
             self.addDockWidget(Qt.RightDockWidgetArea, self.slam_plot_dockWidget)
             self.addDockWidget(Qt.RightDockWidgetArea, self.feature_graph_dockWidget)
-            self.tabifyDockWidget(self.slam_plot_dockWidget, self.feature_graph_dockWidget)
+            self.tabifyDockWidget(
+                self.slam_plot_dockWidget, self.feature_graph_dockWidget
+            )
             self.addDockWidget(Qt.TopDockWidgetArea, self.options_dockWidget)
             self.slam_plot_dockWidget.raise_()
 
@@ -506,14 +510,24 @@ class MainWindow(QMainWindow):
             # resize widgets
             self.screen_height = self.height()
             self.screen_width = self.width()
-            print("Window size: " + str(self.screen_width) + "x" + str(self.screen_height))
+            print(
+                "Window size: " + str(self.screen_width) + "x" + str(self.screen_height)
+            )
             options_height_ratio = 0.05
-            self.widget.setFixedSize(self.screen_width / 2, self.screen_height * (1-options_height_ratio))
-            self.options_frame.resize(self.screen_width, self.screen_height * options_height_ratio)
-            self.options_dockWidget.resize(self.screen_width, self.screen_height * options_height_ratio)
-            self.slam_results_plot.resize(self.screen_width / 2, self.screen_height * (1-options_height_ratio))
+            self.widget.setFixedSize(
+                self.screen_width / 2, self.screen_height * (1 - options_height_ratio)
+            )
+            self.options_frame.resize(
+                self.screen_width, self.screen_height * options_height_ratio
+            )
+            self.options_dockWidget.resize(
+                self.screen_width, self.screen_height * options_height_ratio
+            )
+            self.slam_results_plot.resize(
+                self.screen_width / 2, self.screen_height * (1 - options_height_ratio)
+            )
             self.feature_graph_window.resize(
-                self.screen_width / 2, self.screen_height * (1-options_height_ratio)
+                self.screen_width / 2, self.screen_height * (1 - options_height_ratio)
             )
 
     def keyPressEvent(self, QKeyEvent):
@@ -571,7 +585,7 @@ class MainWindow(QMainWindow):
             n_of_keypoints=self.n_of_keypoints,
             max_distance=self.max_distance,
             skip_images_slam=self.mat_engine.skip_images,
-            skip_images_network=self.skip_images_network
+            skip_images_network=self.skip_images_network,
         )
         # if dialog is accepted (ok clicked) then get all the relevant values via getter-functions
         if settings_dialog.exec_() == QDialog.Accepted:
@@ -607,7 +621,7 @@ class MainWindow(QMainWindow):
         self.real_world.root.ellipsoid.surfaceConstraint.pressure.value = value
         # probably do this for the sim as well in the future (right now only the sim that is supposed to be the real world)
 
-    def extract_network(self):     
+    def extract_network(self):
         if self.skip_counter_network == self.skip_images_network:
             self.skip_counter_network = 0
             nxs.draw_img_and_graph(
@@ -615,7 +629,7 @@ class MainWindow(QMainWindow):
                 image=self.view_real.get_screen_shot(),
                 graph_item=self.graph_item,
                 n_of_keypoints=self.n_of_keypoints,
-                max_distance=self.max_distance
+                max_distance=self.max_distance,
             )
         else:
             self.skip_counter_network += 1
@@ -634,15 +648,15 @@ class MainWindow(QMainWindow):
         else:
             self.colortheme = "dark"
             self.set_dark_theme()
-            
+
     def set_light_theme(self):
         self.setStyleSheet(
             qdarkstyle.load_stylesheet(qdarkstyle.light.palette.LightPalette)
         )
         self.feature_graph_window.setBackground("#CED1D4")
         self.slam_results_plot.setBackgroundColor("#CED1D4")
-        self.view_real.set_background_color([206/255, 209/255, 212/255, 1])
-        self.view_sim.set_background_color([206/255, 209/255, 212/255, 1])
+        self.view_real.set_background_color([206 / 255, 209 / 255, 212 / 255, 1])
+        self.view_sim.set_background_color([206 / 255, 209 / 255, 212 / 255, 1])
         self.buttonstyle_not_clicked = "QPushButton {color:#19232D}"
         self.buttonstyle_clicked = "QPushButton {color:red}"
         self.text_edit_console.setStyleSheet(
@@ -655,13 +669,13 @@ class MainWindow(QMainWindow):
         )
         self.feature_graph_window.setBackground("#37414F")
         self.slam_results_plot.setBackgroundColor("#37414F")
-        self.view_real.set_background_color([55/255, 65/255, 79/255, 1])
-        self.view_sim.set_background_color([55/255, 65/255, 79/255, 1])
+        self.view_real.set_background_color([55 / 255, 65 / 255, 79 / 255, 1])
+        self.view_sim.set_background_color([55 / 255, 65 / 255, 79 / 255, 1])
         self.buttonstyle_not_clicked = "QPushButton {color:white}"
         self.buttonstyle_clicked = "QPushButton {color:red}"
         self.text_edit_console.setStyleSheet(
             "QTextEdit {background-color:#19232D; color:white}"
-        )  
+        )
 
     def __del__(self):
         # Restore sys.stdout
