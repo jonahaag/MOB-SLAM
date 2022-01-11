@@ -131,17 +131,15 @@ class EngineORB:
             self.n_positions = self.positions.shape[0]
             self.current_line = 0
         keyframes_dir = os.path.join(self.mat_dir, "keyframes")
-        for f in os.listdir(keyframes_dir):
-            os.remove(os.path.join(keyframes_dir, f))
+        try:
+            for f in os.listdir(keyframes_dir):
+                os.remove(os.path.join(keyframes_dir, f))
+        except:
+            pass
 
     def set_viewer(self, viewer: SofaGLViewer):
         self.viewer = viewer
         self._viewer_set = True
-        # try:
-        #     self._update_timer.disconnect()
-        # except TypeError:
-        #     pass
-        # self._update_timer.timeout.connect(self.viewer.update)
         self.viewer.key_pressed.connect(self.keyPressEvent)
         # self.viewer.key_released.connect(self.keyReleaseEvent)
 
@@ -162,6 +160,7 @@ class EngineORB:
 
     def update_sim_step(self):
         # keep track of number of simulation steps
+        # function call needed to connect the signal
         self.sim_step += 1
 
     def viewer_info(self, viewer_size, intrinsics):
@@ -455,8 +454,7 @@ class EngineORB:
         self.mat.forward_predict_map_points(nargout=0)
 
     def update_sim_camera(self):
-        # update the camera of the simulation based on current Slam results (estimated camera pose)
-        # option 2: use real world camera position measurement instead (avoid backwards transformation of slam data/coordinates)
-        # do only when keyframe is detected?
+        # update the camera of the simulation real world camera position measurement
+        # unnecessary atm, since simulation view is not displayed
         self.sofa_sim.root.camera.position = self.cam_pos
         self.sofa_sim.root.camera.orientation = self.cam_ori

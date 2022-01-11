@@ -8,11 +8,7 @@ from gui.orb import EngineORB
 from feature_graph import network as nxs
 import os
 import pyqtgraph as pg
-
-# import pyqtgraph.widgets
 import pyqtgraph.opengl as gl
-
-# import numpy as np
 import sys
 import qdarkstyle
 
@@ -45,7 +41,8 @@ class CustomDialog(QDialog):
         visual_flags,
         n_of_keypoints,
         max_distance,
-        skip_images,
+        skip_images_slam,
+        skip_images_network
     ):
         super(CustomDialog, self).__init__()
 
@@ -60,19 +57,19 @@ class CustomDialog(QDialog):
         )
         self.follow_camera_checkbox.setChecked(False)
         # change the number of simulation steps to be skipped before new screenshot is recorded for the SLAM
-        self.skip_images_label = QLabel(
+        self.skip_images_slam_label = QLabel(
             "Number of simulation steps to be skipped before new SLAM step:"
         )
-        self.skip_images_label_line_edit = QLineEdit(str(skip_images))
-        self.skip_images_label_line_edit.setAlignment(Qt.AlignRight)
-        self.skip_images_label_line_edit.textChanged.connect(
-            self.on_skip_images_changed
+        self.skip_images_slam_label_line_edit = QLineEdit(str(skip_images_slam))
+        self.skip_images_slam_label_line_edit.setAlignment(Qt.AlignRight)
+        self.skip_images_slam_label_line_edit.textChanged.connect(
+            self.on_skip_images_slam_changed
         )
-        self.skip_images = skip_images
+        self.skip_images_slam = skip_images_slam
         # set layout etc.
         self.general_tab_layout.addWidget(self.follow_camera_checkbox, 0, 0, 1, 2)
-        self.general_tab_layout.addWidget(self.skip_images_label, 1, 0, 1, 1)
-        self.general_tab_layout.addWidget(self.skip_images_label_line_edit, 1, 1)
+        self.general_tab_layout.addWidget(self.skip_images_slam_label, 1, 0, 1, 1)
+        self.general_tab_layout.addWidget(self.skip_images_slam_label_line_edit, 1, 1)
         self.general_tab_layout.setColumnStretch(0, 4)
         self.general_tab_layout.setColumnStretch(1, 1)
         self.general_tab.setLayout(self.general_tab_layout)
@@ -137,11 +134,23 @@ class CustomDialog(QDialog):
             self.on_max_distance_changed
         )
         self.max_distance = max_distance
+        # change the number of simulation steps to be skipped before new screenshot is recorded for the feature graph
+        self.skip_images_network_label = QLabel(
+            "Number of simulation steps to be skipped before new SLAM step:"
+        )
+        self.skip_images_network_label_line_edit = QLineEdit(str(skip_images_network))
+        self.skip_images_network_label_line_edit.setAlignment(Qt.AlignRight)
+        self.skip_images_network_label_line_edit.textChanged.connect(
+            self.on_skip_images_network_changed
+        )
+        self.skip_images_network = skip_images_network
         # set layout etc.
         self.networkx_tab_layout.addWidget(self.n_of_keypoints_label, 0, 0)
         self.networkx_tab_layout.addWidget(self.n_of_keypoints_line_edit, 0, 1)
         self.networkx_tab_layout.addWidget(self.max_distance_label, 1, 0)
         self.networkx_tab_layout.addWidget(self.max_distance_label_line_edit, 1, 1)
+        self.general_tab_layout.addWidget(self.skip_images_network_label, 2, 0, 1, 1)
+        self.general_tab_layout.addWidget(self.skip_images_network_label_line_edit, 2, 1)
         self.networkx_tab_layout.setColumnStretch(0, 4)
         self.networkx_tab_layout.setColumnStretch(1, 1)
         self.networkx_tab.setLayout(self.networkx_tab_layout)
@@ -177,11 +186,11 @@ class CustomDialog(QDialog):
     def get_is_following_camera(self):
         return self.follow_camera_checkbox.isChecked()
 
-    def on_skip_images_changed(self, text):
-        self.skip_images = int(float(text))
+    def on_skip_images_slam_changed(self, text):
+        self.skip_images_slam = int(float(text))
 
-    def get_skip_images(self):
-        return self.skip_images
+    def get_skip_images_slam(self):
+        return self.skip_images_slam
 
     def on_young_modulus_changed(self, text):
         self.young_modulus = float(text)
@@ -215,42 +224,44 @@ class CustomDialog(QDialog):
     def get_max_distance(self):
         return self.max_distance
 
+    def on_skip_images_network_changed(self, text):
+        self.skip_images_network = int(float(text))
+
+    def get_skip_images_network(self):
+        return self.skip_images_network
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
-        self.real_world = (
-            SofaSim()
-        )  # class to hold the scene, simulation representing the real world
-        self.real_world.init_sim()  # initialize the scene
+
+        # class to hold the scene, simulation representing the real world
+        self.real_world = SofaSim()
+
+        # initialize the scene
+        self.real_world.init_sim()
 
         # create an opengl view to display a node from sofa and control a camera
         self.view_real = SofaGLViewer(
             sofa_visuals_node=self.real_world.root, camera=self.real_world.root.camera
         )
 
-        # set the view to be the main widget of the window. In the future, this should be done in a layout
-        # self.setCentralWidget(self.view_real)
-        # self.setWindowTitle("'Real world' view")
+        # set a qt signal to update the view after sim step
+        self.real_world.animation_end.connect(self.view_real.update)
 
-        self.real_world.animation_end.connect(
-            self.view_real.update
-        )  # set a qt signal to update the view after sim step
-
-        # Add a class to control a view's camera using an xbox controller
-        # self.view_control = QXBoxViewController(dead_zone=0.3, translate_rate_limit=1.5, rotate_rate_limit=20)
-        # self.view_control.set_viewer(self.sofa_view)  # set the active view to control
+        # create instance of keyboard controller
         self.view_control = QSofaViewKeyboardController(
             translate_rate_limit=1, rotate_rate_limit=5, update_rate=20
         )
+        # set the opengl view to be controlled
         self.view_control.set_viewer(self.view_real)
 
-        # draw the scene at a constant update rate. This is done so the scene is drawn even if nothing is being animated
+        # draw the scene at a constant update rate
+        # this is done so the scene is drawn even if nothing is being animated
         self.view_control.start_auto_update()
 
         # create an opengl view to display sofa simulation for model-based slam
         self.simWindow = SecondWindow()
-        # self.simWindow.show() # views do not update correctly
         self.sofa_sim = self.simWindow.sofa_sim
         self.view_sim = self.simWindow.view_sim
         self.sofa_sim.animation_end.connect(self.view_sim.update)
@@ -263,14 +274,17 @@ class MainWindow(QMainWindow):
         self.colortheme = "dark"
         self.buttonstyle_not_clicked = "QPushButton {color:white}"
         self.buttonstyle_clicked = "QPushButton {color:red}"
+        # which parts of the sofa model to display initially, here only the visual model
         self.visual_flags = [
             True,
             False,
             False,
             False,
-        ]  # intially only show visual model
+        ]
+        # number of keypoints of networkx graph
         self.n_of_keypoints = 200
-        self.max_distance = 100  # in pixels
+        # max distance in pixels between two keypoints to be connected in networkx graph
+        self.max_distance = 100
 
         ### maybe add sofa_view seperately once real camera_data is used
         # requires some layout redesign though
@@ -279,57 +293,64 @@ class MainWindow(QMainWindow):
         # widget.setLayout(layout)
         # self.setCentralWidget(widget)
 
-        # add gl view widget to layout, this widget consists of...
-        # ...scatter plot item for worldpoints
-        # ...line plot items for estimated and actual camera positions
         # alternative plotting library: https://github.com/marcomusy/vedo
+        # add gl view widget to layout, this widget consists of...
         self.slam_results_plot = gl.GLViewWidget()
+        # ...scatter plot item for worldpoints
         self.worldpoint_plot = gl.GLScatterPlotItem()
+        # ...line plot items for estimated and actual camera positions
         self.cam_pos_plot = gl.GLLinePlotItem()
         self.ground_truth_plot = gl.GLLinePlotItem()
         self.axis = gl.GLAxisItem()
         self.grid = gl.GLGridItem()
+        # add camera position and ground truth to results plot
         self.slam_results_plot.addItem(self.cam_pos_plot)
         self.slam_results_plot.addItem(self.ground_truth_plot)
         self.slam_results_plot.addItem(self.axis)
         self.slam_results_plot.addItem(self.grid)
         self.slam_results_plot.setBackgroundColor("#19232D")
-        self.slam_results_plot.opts["distance"] = 3.5  ## distance of camera from center
-        self.slam_results_plot.opts["fov"] = 60  ## horizontal field of view in degrees
-        self.slam_results_plot.opts[
-            "elevation"
-        ] = -65  ## camera's angle of elevation in degrees
-        self.slam_results_plot.opts[
-            "azimuth"
-        ] = 30  ## camera's azimuthal angle in degrees
+        # distance of camera from center
+        self.slam_results_plot.opts["distance"] = 3.5
+        # horizontal field of view in degrees
+        self.slam_results_plot.opts["fov"] = 60
+        # camera's angle of elevation in degrees
+        self.slam_results_plot.opts["elevation"] = -65
+        # camera's azimuthal angle in degrees 
+        self.slam_results_plot.opts["azimuth"] = 30
         self.slam_results_plot.pan(dx=0, dy=0, dz=0.3, relative="global")
-        self.is_following_camera = False  # flag for the plot function, changes based on getter-function from the settings dialog
+        # flag for the plot function, changes based on getter-function from the settings dialog
+        # hint: do not use, very buggy
+        self.is_following_camera = False
 
         # add graphics window to layout, this widget consists of...
-        # ...viewbox, which consist of...
-        # ...image item to display image
-        # ...graph item to display networkx graph
         self.feature_graph_window = pg.GraphicsWindow()
+        # ...viewbox, which consist of...
         self.feature_graph_viewbox = self.feature_graph_window.addViewBox()
-        self.feature_graph_viewbox.invertY(True)  # else img is upside down
-        pg.setConfigOption("imageAxisOrder", "row-major")  # default is column-major
+        # invert image along the y axis, else img is upside down
+        self.feature_graph_viewbox.invertY(True)
+        # set major, default is column-major
+        pg.setConfigOption("imageAxisOrder", "row-major")
+        # ...image item to display image
         self.image_item = pg.ImageItem()
         self.feature_graph_viewbox.addItem(self.image_item)
+        # ...graph item to display networkx graph
         self.graph_item = pg.GraphItem()
         self.feature_graph_viewbox.addItem(self.graph_item)
-        self.graph_item.setZValue(10)  # display graph item ontop of image
+        # display graph item ontop of image
+        self.graph_item.setZValue(10)
         # self.feature_graph_viewbox.setContentsMargins(0,0,0,0)
         self.feature_graph_window.setBackground(background=None)
+        self.skip_counter_network = 0
+        self.skip_images_network = 20
 
-        # Install the custom output stream
+        # install the custom output stream
         sys.stdout = EmittingStream(textWritten=self.normalOutputWritten)
 
         # text edit to which the console output is redirected
         self.text_edit_console = QTextEdit()
         self.text_edit_console.setCursorWidth(0)
         self.text_edit_console.setReadOnly(True)
-        # self.text_edit_console.setAlignment(Qt.AlignCenter)
-        # self.text_edit_console.setFont(QFont(self.font, 14))
+        # Welcome message
         print("Welcome to SLAM Dashboard!")
         print(
             "When starting the simulation the camera follows the keypoint-navigation specified in 'SofaViewer/Trajectories/navigation/keypoints1b.txt'. After that you can move around using the w-a-s-d and arrowkeys!"
@@ -455,11 +476,15 @@ class MainWindow(QMainWindow):
 
         # for some weird reason this needs to be added later else python crashes on my mac (only true for GLScatterPlotItem and GLImageItem)
         self.slam_results_plot.addItem(self.worldpoint_plot)
-        # TODO add legend to plots
+        # add legend to plot, fails due to GLViewWidget not having 'scene' attribute
+        # legend = pg.LegendItem()
+        # legend.addItem(self.cam_pos_plot, "Estimated camera position")
+        # legend.addItem(self.ground_truth_plot, "Ground truth")
+        # legend.setParentItem(self.slam_results_plot)
 
-        # initialize matlab engine and slam tracking/mapping the real world
+        # initialize matlab engine and slam tracking/mapping of the "real" world
         current_dir = os.path.dirname(__file__)
-        mat_dir = os.path.join(current_dir, "../SLAM/")
+        mat_dir = os.path.join(current_dir, "../slam/")
         self.mat_engine = EngineORB(
             mat_dir=mat_dir,
             skip_images_init=4,
@@ -545,12 +570,13 @@ class MainWindow(QMainWindow):
             visual_flags=self.visual_flags,
             n_of_keypoints=self.n_of_keypoints,
             max_distance=self.max_distance,
-            skip_images=self.mat_engine.skip_images_main,
+            skip_images_slam=self.mat_engine.skip_images,
+            skip_images_network=self.skip_images_network
         )
         # if dialog is accepted (ok clicked) then get all the relevant values via getter-functions
         if settings_dialog.exec_() == QDialog.Accepted:
             self.is_following_camera = settings_dialog.get_is_following_camera()
-            self.mat_engine.skip_images_main = settings_dialog.get_skip_images()
+            self.mat_engine.skip_images = settings_dialog.get_skip_images_slam()
             self.real_world.root.ellipsoid.fem.youngModulus.value = [
                 settings_dialog.get_young_modulus()
             ]
@@ -574,21 +600,25 @@ class MainWindow(QMainWindow):
             self.real_world.root.VisualStyle.displayFlags = flag_string
             self.n_of_keypoints = settings_dialog.get_n_of_keypoints()
             self.max_distance = settings_dialog.get_max_distance()
+            self.skip_images_network = settings_dialog.get_skip_images_network()
 
     def on_value_changed_slider(self, value):
         # pressure = self.real_world.root.ellipsoid.surfaceConstraint.pressure.value
         self.real_world.root.ellipsoid.surfaceConstraint.pressure.value = value
         # probably do this for the sim as well in the future (right now only the sim that is supposed to be the real world)
 
-    def extract_network(self):
-        # TODO skip_counter
-        nxs.draw_img_and_graph(
-            image_item=self.image_item,
-            image=self.view_real.get_screen_shot(),
-            graph_item=self.graph_item,
-            n_of_keypoints=self.n_of_keypoints,
-            max_distance=self.max_distance,
-        )
+    def extract_network(self):        
+        if self.skip_counter_network == self.skip_images_network:
+            self.skip_counter_network = 0
+            nxs.draw_img_and_graph(
+                image_item=self.image_item,
+                image=self.view_real.get_screen_shot(),
+                graph_item=self.graph_item,
+                n_of_keypoints=self.n_of_keypoints,
+                max_distance=self.max_distance
+            )
+        else:
+            self.skip_counter_network += 1
 
     def on_networkx_checkbox_change(self):
         if self.mat_engine.is_extracting_graph:
