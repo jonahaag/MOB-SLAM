@@ -9,12 +9,13 @@ from .SofaGLViewer import SofaGLViewer
 class QXBoxViewController(QObject):
     view_update_requested = Signal()
 
-    def __init__(self,
-                 dead_zone=0.3,
-                 translate_rate_limit=1.5,  # mm/s
-                 rotate_rate_limit=20,  # deg/s
-                 update_rate=20  # Hz
-                 ):
+    def __init__(
+        self,
+        dead_zone=0.3,
+        translate_rate_limit=1.5,  # mm/s
+        rotate_rate_limit=20,  # deg/s
+        update_rate=20,  # Hz
+    ):
         super(QXBoxViewController, self).__init__()
 
         self.viewer = None  # type: SofaGLViewer
@@ -28,23 +29,38 @@ class QXBoxViewController(QObject):
         self.controller.moveToThread(self.xbox_thread)
         self.xbox_thread.started.connect(self.controller.start)
         self.xbox_thread.start()
-        self.controller.axis_rjoy_action.connect(lambda x: self.update_viewer_cam(self.viewer, 'r_thumb', x))
-        self.controller.axis_ljoy_action.connect(lambda x: self.update_viewer_cam(self.viewer, 'l_thumb', x))
-        self.controller.button_lbump_action.connect(lambda x: setattr(self, '_bumper_pressed', x))
-        self.controller.axis_rtrigger_action.connect(lambda x: self.update_viewer_cam(self.viewer, 'r_trigger', x))
-        self.controller.axis_ltrigger_action.connect(lambda x: self.update_viewer_cam(self.viewer, 'l_trigger', x))
+        self.controller.axis_rjoy_action.connect(
+            lambda x: self.update_viewer_cam(self.viewer, "r_thumb", x)
+        )
+        self.controller.axis_ljoy_action.connect(
+            lambda x: self.update_viewer_cam(self.viewer, "l_thumb", x)
+        )
+        self.controller.button_lbump_action.connect(
+            lambda x: setattr(self, "_bumper_pressed", x)
+        )
+        self.controller.axis_rtrigger_action.connect(
+            lambda x: self.update_viewer_cam(self.viewer, "r_trigger", x)
+        )
+        self.controller.axis_ltrigger_action.connect(
+            lambda x: self.update_viewer_cam(self.viewer, "l_trigger", x)
+        )
         self._update_timer = QTimer()
         self.camera_timer = QTimer()
         self.camera_timer.timeout.connect(self.update_camera)
-        self.camera_timer.setInterval(1/update_rate)
+        self.camera_timer.setInterval(1 / update_rate)
         self.translate_rate_limit = translate_rate_limit
         self.rotate_rate_limit = rotate_rate_limit
-        self.current_translational_speed = [0., 0., 0.]  # in percent of max speed
-        self.current_rotational_speed = [0., 0., 0.]  # in percent of max speed
+        self.current_translational_speed = [0.0, 0.0, 0.0]  # in percent of max speed
+        self.current_rotational_speed = [0.0, 0.0, 0.0]  # in percent of max speed
         self.camera_timer.start()
         self.time_at_last_update = time.time()
 
-        self.controller.button_x_action.connect(lambda: print(self.viewer.camera.position.array(), self.viewer.camera.orientation.array()))
+        self.controller.button_x_action.connect(
+            lambda: print(
+                self.viewer.camera.position.array(),
+                self.viewer.camera.orientation.array(),
+            )
+        )
 
     def set_viewer(self, viewer):
         self.viewer = viewer
@@ -57,7 +73,7 @@ class QXBoxViewController(QObject):
 
     def start_auto_update(self, rate=0.05):
         if not self._viewer_set:
-            print('Cannot start auto-update. No SofaGLViewer is set.')
+            print("Cannot start auto-update. No SofaGLViewer is set.")
             return
         self._update_timer.setInterval(rate)
         self._update_timer.start()
@@ -68,23 +84,38 @@ class QXBoxViewController(QObject):
     def update_viewer_cam(self, viewer, action, value):
         if not self._viewer_set:
             return
-        if action == 'l_thumb':
-            self.current_translational_speed = [self.scale_axis_value(-value['x']),
-                                                  self.scale_axis_value(-value['y']),
-                                                  self.current_translational_speed[2]]
-        elif action == 'r_thumb':
-            self.current_rotational_speed = [self.scale_axis_value(-value['y']), self.current_rotational_speed[1],
-                                               self.scale_axis_value(value['x'])] if self._bumper_pressed else [
-                self.scale_axis_value(-value['y']), self.scale_axis_value(value['x']),
-                self.current_rotational_speed[2]]
-        elif action == 'r_trigger':
-            self.current_translational_speed = [self.current_translational_speed[0],
-                                                  self.current_translational_speed[1],
-                                                  value]
-        elif action == 'l_trigger':
-            self.current_translational_speed = [self.current_translational_speed[0],
-                                                  self.current_translational_speed[1],
-                                                  -value]
+        if action == "l_thumb":
+            self.current_translational_speed = [
+                self.scale_axis_value(-value["x"]),
+                self.scale_axis_value(-value["y"]),
+                self.current_translational_speed[2],
+            ]
+        elif action == "r_thumb":
+            self.current_rotational_speed = (
+                [
+                    self.scale_axis_value(-value["y"]),
+                    self.current_rotational_speed[1],
+                    self.scale_axis_value(value["x"]),
+                ]
+                if self._bumper_pressed
+                else [
+                    self.scale_axis_value(-value["y"]),
+                    self.scale_axis_value(value["x"]),
+                    self.current_rotational_speed[2],
+                ]
+            )
+        elif action == "r_trigger":
+            self.current_translational_speed = [
+                self.current_translational_speed[0],
+                self.current_translational_speed[1],
+                value,
+            ]
+        elif action == "l_trigger":
+            self.current_translational_speed = [
+                self.current_translational_speed[0],
+                self.current_translational_speed[1],
+                -value,
+            ]
         self.view_update_requested.emit()
 
     def scale_axis_value(self, axis_input):
@@ -92,7 +123,11 @@ class QXBoxViewController(QObject):
         if abs(scaled) < self._dead_zone:
             return 0
         else:
-            return np.sign(scaled) * (abs(scaled) - self._dead_zone) / (1 - self._dead_zone)
+            return (
+                np.sign(scaled)
+                * (abs(scaled) - self._dead_zone)
+                / (1 - self._dead_zone)
+            )
 
     def update_camera(self):
         now = time.time()
@@ -100,15 +135,27 @@ class QXBoxViewController(QObject):
         self.time_at_last_update = now
 
         # very inefficiently calculate the new angle for the camera
-        current_rotational_speed = np.array(self.current_rotational_speed) * self.rotate_rate_limit
+        current_rotational_speed = (
+            np.array(self.current_rotational_speed) * self.rotate_rate_limit
+        )
         additional_rotation = current_rotational_speed * time_since_last_update
-        rotation = transform.Rotation.from_euler("XYZ", additional_rotation, degrees=True)
+        rotation = transform.Rotation.from_euler(
+            "XYZ", additional_rotation, degrees=True
+        )
         self.viewer.camera.rotate(rotation.as_quat().tolist())
-        current_orientation = transform.Rotation.from_quat(self.viewer.camera.orientation.array())
+        current_orientation = transform.Rotation.from_quat(
+            self.viewer.camera.orientation.array()
+        )
 
         # calculate the new position
         current_position = self.viewer.camera.position.array()
-        current_translational_speed = np.array(self.current_translational_speed) * self.translate_rate_limit
+        current_translational_speed = (
+            np.array(self.current_translational_speed) * self.translate_rate_limit
+        )
         self.viewer.camera.position = self.viewer.camera.position.array()
         self.viewer.camera.position = list(
-            current_position + current_orientation.apply(current_translational_speed * time_since_last_update))
+            current_position
+            + current_orientation.apply(
+                current_translational_speed * time_since_last_update
+            )
+        )

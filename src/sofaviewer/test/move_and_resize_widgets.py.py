@@ -11,24 +11,32 @@ from enum import Enum
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import QPoint, pyqtSignal, QRect
 from PyQt5.QtGui import QColor, QCursor, QPainterPath, QBrush
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QMenu, QLabel, QMainWindow
+from PyQt5.QtWidgets import (
+    QApplication,
+    QWidget,
+    QVBoxLayout,
+    QMenu,
+    QLabel,
+    QMainWindow,
+)
 
 
 class Mode(Enum):
-    NONE = 0,
-    MOVE = 1,
-    RESIZETL = 2,
-    RESIZET = 3,
-    RESIZETR = 4,
-    RESIZER = 5,
-    RESIZEBR = 6,
-    RESIZEB = 7,
-    RESIZEBL = 8,
+    NONE = (0,)
+    MOVE = (1,)
+    RESIZETL = (2,)
+    RESIZET = (3,)
+    RESIZETR = (4,)
+    RESIZER = (5,)
+    RESIZEBR = (6,)
+    RESIZEB = (7,)
+    RESIZEBL = (8,)
     RESIZEL = 9
 
 
 class TContainer(QWidget):
-    """ allow to move and resize by user"""
+    """allow to move and resize by user"""
+
     menu = None
     mode = Mode.NONE
     position = None
@@ -39,7 +47,7 @@ class TContainer(QWidget):
     def __init__(self, parent, p, cWidget):
         super().__init__(parent=parent)
 
-        self.menu = QMenu(parent=self, title='menu')
+        self.menu = QMenu(parent=self, title="menu")
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
         self.setVisible(True)
         self.setAutoFillBackground(False)
@@ -63,7 +71,7 @@ class TContainer(QWidget):
             self.childWidget.setParent(self)
             self.childWidget.releaseMouse()
             self.vLayout.addWidget(cWidget)
-            self.vLayout.setContentsMargins(0,0,0,0)
+            self.vLayout.setContentsMargins(0, 0, 0, 0)
 
     def popupShow(self, pt: QPoint):
         if self.menu.isEmpty:
@@ -96,13 +104,14 @@ class TContainer(QWidget):
 
         if self.m_infocus:
             rect = e.rect()
-            rect.adjust(0,0,-1,-1)
+            rect.adjust(0, 0, -1, -1)
             painter.setPen(QColor(r, g, b))
             painter.drawRect(rect)
 
-
     def mousePressEvent(self, e: QtGui.QMouseEvent):
-        self.position = QPoint(e.globalX() - self.geometry().x(), e.globalY() - self.geometry().y())
+        self.position = QPoint(
+            e.globalX() - self.geometry().x(), e.globalY() - self.geometry().y()
+        )
         if not self.m_isEditing:
             return
         if not self.m_infocus:
@@ -115,7 +124,8 @@ class TContainer(QWidget):
             e.accept()
 
     def keyPressEvent(self, e: QtGui.QKeyEvent):
-        if not self.m_isEditing: return
+        if not self.m_isEditing:
+            return
         if e.key() == QtCore.Qt.Key_Delete:
             self.deleteLater()
         # Moving container with arrows
@@ -142,69 +152,79 @@ class TContainer(QWidget):
                 self.resize(self.width() + 1, self.height())
         self.newGeometry.emit(self.geometry())
 
-
     def setCursorShape(self, e_pos: QPoint):
         diff = 3
         # Left - Bottom
 
-        if (((e_pos.y() > self.y() + self.height() - diff) and # Bottom
-            (e_pos.x() < self.x() + diff)) or # Left
-        # Right-Bottom
-        ((e_pos.y() > self.y() + self.height() - diff) and # Bottom
-        (e_pos.x() > self.x() + self.width() - diff)) or # Right
-        # Left-Top
-        ((e_pos.y() < self.y() + diff) and # Top
-        (e_pos.x() < self.x() + diff)) or # Left
-        # Right-Top
-        (e_pos.y() < self.y() + diff) and # Top
-        (e_pos.x() > self.x() + self.width() - diff)): # Right
+        if (
+            (
+                (e_pos.y() > self.y() + self.height() - diff)
+                and (e_pos.x() < self.x() + diff)  # Bottom
+            )
+            or  # Left
+            # Right-Bottom
+            (
+                (e_pos.y() > self.y() + self.height() - diff)
+                and (e_pos.x() > self.x() + self.width() - diff)  # Bottom
+            )
+            or  # Right
+            # Left-Top
+            ((e_pos.y() < self.y() + diff) and (e_pos.x() < self.x() + diff))  # Top
+            or  # Left
+            # Right-Top
+            (e_pos.y() < self.y() + diff)
+            and (e_pos.x() > self.x() + self.width() - diff)  # Top
+        ):  # Right
             # Left - Bottom
-            if ((e_pos.y() > self.y() + self.height() - diff) and # Bottom
-            (e_pos.x() < self.x()
-                + diff)): # Left
+            if (e_pos.y() > self.y() + self.height() - diff) and (  # Bottom
+                e_pos.x() < self.x() + diff
+            ):  # Left
                 self.mode = Mode.RESIZEBL
                 self.setCursor(QCursor(QtCore.Qt.SizeBDiagCursor))
                 # Right - Bottom
-            if ((e_pos.y() > self.y() + self.height() - diff) and # Bottom
-            (e_pos.x() > self.x() + self.width() - diff)): # Right
+            if (e_pos.y() > self.y() + self.height() - diff) and (  # Bottom
+                e_pos.x() > self.x() + self.width() - diff
+            ):  # Right
                 self.mode = Mode.RESIZEBR
                 self.setCursor(QCursor(QtCore.Qt.SizeFDiagCursor))
             # Left - Top
-            if ((e_pos.y() < self.y() + diff) and # Top
-            (e_pos.x() < self.x() + diff)): # Left
+            if (e_pos.y() < self.y() + diff) and (  # Top
+                e_pos.x() < self.x() + diff
+            ):  # Left
                 self.mode = Mode.RESIZETL
                 self.setCursor(QCursor(QtCore.Qt.SizeFDiagCursor))
             # Right - Top
-            if ((e_pos.y() < self.y() + diff) and # Top
-            (e_pos.x() > self.x() + self.width() - diff)): # Right
+            if (e_pos.y() < self.y() + diff) and (  # Top
+                e_pos.x() > self.x() + self.width() - diff
+            ):  # Right
                 self.mode = Mode.RESIZETR
                 self.setCursor(QCursor(QtCore.Qt.SizeBDiagCursor))
         # check cursor horizontal position
-        elif ((e_pos.x() < self.x() + diff) or # Left
-            (e_pos.x() > self.x() + self.width() - diff)): # Right
-            if e_pos.x() < self.x() + diff: # Left
+        elif (e_pos.x() < self.x() + diff) or (  # Left
+            e_pos.x() > self.x() + self.width() - diff
+        ):  # Right
+            if e_pos.x() < self.x() + diff:  # Left
                 self.setCursor(QCursor(QtCore.Qt.SizeHorCursor))
                 self.mode = Mode.RESIZEL
-            else: # Right
+            else:  # Right
                 self.setCursor(QCursor(QtCore.Qt.SizeHorCursor))
                 self.mode = Mode.RESIZER
         # check cursor vertical position
-        elif ((e_pos.y() > self.y() + self.height() - diff) or # Bottom
-            (e_pos.y() < self.y() + diff)): # Top
-            if e_pos.y() < self.y() + diff: # Top
+        elif (e_pos.y() > self.y() + self.height() - diff) or (  # Bottom
+            e_pos.y() < self.y() + diff
+        ):  # Top
+            if e_pos.y() < self.y() + diff:  # Top
                 self.setCursor(QCursor(QtCore.Qt.SizeVerCursor))
                 self.mode = Mode.RESIZET
-            else: # Bottom
+            else:  # Bottom
                 self.setCursor(QCursor(QtCore.Qt.SizeVerCursor))
                 self.mode = Mode.RESIZEB
         else:
-            self.setCursor(QCursor(QtCore.Qt. ArrowCursor))
+            self.setCursor(QCursor(QtCore.Qt.ArrowCursor))
             self.mode = Mode.MOVE
-
 
     def mouseReleaseEvent(self, e: QtGui.QMouseEvent):
         QWidget.mouseReleaseEvent(self, e)
-
 
     def mouseMoveEvent(self, e: QtGui.QMouseEvent):
         QWidget.mouseMoveEvent(self, e)
@@ -217,47 +237,57 @@ class TContainer(QWidget):
             self.setCursorShape(p)
             return
 
-        if (self.mode == Mode.MOVE or self.mode == Mode.NONE) and e.buttons() and QtCore.Qt.LeftButton:
+        if (
+            (self.mode == Mode.MOVE or self.mode == Mode.NONE)
+            and e.buttons()
+            and QtCore.Qt.LeftButton
+        ):
             toMove = e.globalPos() - self.position
-            if toMove.x() < 0:return
-            if toMove.y() < 0:return
-            if toMove.x() > self.parentWidget().width() - self.width(): return
+            if toMove.x() < 0:
+                return
+            if toMove.y() < 0:
+                return
+            if toMove.x() > self.parentWidget().width() - self.width():
+                return
             self.move(toMove)
             self.newGeometry.emit(self.geometry())
             self.parentWidget().repaint()
             return
         if (self.mode != Mode.MOVE) and e.buttons() and QtCore.Qt.LeftButton:
-            if self.mode == Mode.RESIZETL: # Left - Top
+            if self.mode == Mode.RESIZETL:  # Left - Top
                 newwidth = e.globalX() - self.position.x() - self.geometry().x()
                 newheight = e.globalY() - self.position.y() - self.geometry().y()
                 toMove = e.globalPos() - self.position
-                self.resize(self.geometry().width() - newwidth, self.geometry().height() - newheight)
+                self.resize(
+                    self.geometry().width() - newwidth,
+                    self.geometry().height() - newheight,
+                )
                 self.move(toMove.x(), toMove.y())
-            elif self.mode == Mode.RESIZETR: # Right - Top
+            elif self.mode == Mode.RESIZETR:  # Right - Top
                 newheight = e.globalY() - self.position.y() - self.geometry().y()
                 toMove = e.globalPos() - self.position
                 self.resize(e.x(), self.geometry().height() - newheight)
                 self.move(self.x(), toMove.y())
-            elif self.mode== Mode.RESIZEBL: # Left - Bottom
+            elif self.mode == Mode.RESIZEBL:  # Left - Bottom
                 newwidth = e.globalX() - self.position.x() - self.geometry().x()
                 toMove = e.globalPos() - self.position
                 self.resize(self.geometry().width() - newwidth, e.y())
                 self.move(toMove.x(), self.y())
-            elif self.mode == Mode.RESIZEB: # Bottom
+            elif self.mode == Mode.RESIZEB:  # Bottom
                 self.resize(self.width(), e.y())
-            elif self.mode == Mode.RESIZEL: # Left
+            elif self.mode == Mode.RESIZEL:  # Left
                 newwidth = e.globalX() - self.position.x() - self.geometry().x()
                 toMove = e.globalPos() - self.position
                 self.resize(self.geometry().width() - newwidth, self.height())
                 self.move(toMove.x(), self.y())
-            elif self.mode == Mode.RESIZET:# Top
+            elif self.mode == Mode.RESIZET:  # Top
                 newheight = e.globalY() - self.position.y() - self.geometry().y()
                 toMove = e.globalPos() - self.position
                 self.resize(self.width(), self.geometry().height() - newheight)
                 self.move(self.x(), toMove.y())
-            elif self.mode == Mode.RESIZER: # Right
+            elif self.mode == Mode.RESIZER:  # Right
                 self.resize(e.x(), self.height())
-            elif self.mode == Mode.RESIZEBR:# Right - Bottom
+            elif self.mode == Mode.RESIZEBR:  # Right - Bottom
                 self.resize(e.x(), e.y())
             self.parentWidget().repaint()
         self.newGeometry.emit(self.geometry())
@@ -270,11 +300,11 @@ class MainWindow(QMainWindow):
         self.showMaximized()
         lab1 = QLabel("Label1")
         lab2 = QLabel("Label2")
-        con1 = TContainer(self, QPoint(10,10), lab1)
-        con2 = TContainer(self, QPoint(20,50), lab2)
+        con1 = TContainer(self, QPoint(10, 10), lab1)
+        con2 = TContainer(self, QPoint(20, 50), lab2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = QApplication(sys.argv)
     ex = MainWindow()
     sys.exit(app.exec_())
