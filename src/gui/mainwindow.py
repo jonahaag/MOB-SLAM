@@ -261,9 +261,14 @@ class MainWindow(QMainWindow):
         self.view_control.start_auto_update()
 
         # create an opengl view to display sofa simulation for model-based slam
-        self.simWindow = SecondWindow()
-        self.sofa_sim = self.simWindow.sofa_sim
-        self.view_sim = self.simWindow.view_sim
+        # self.simWindow = SecondWindow()
+        # self.sofa_sim = self.simWindow.sofa_sim
+        # self.view_sim = self.simWindow.view_sim
+        self.sofa_sim = SofaSim()  # class to hold the scene
+        self.sofa_sim.init_sim()  # initialize the scene
+        self.view_sim = SofaGLViewer(
+            sofa_visuals_node=self.sofa_sim.root, camera=self.sofa_sim.root.camera
+        )
         self.sofa_sim.animation_end.connect(self.view_sim.update)
 
         # font and background settings, stylesheets
@@ -434,10 +439,10 @@ class MainWindow(QMainWindow):
         # self.main_grid.setContentsMargins(0,0,0,0)
         # self.main_grid.setSpacing(1)
 
-        # create dock widgets for options and plots that contain the previously created widgets/layouts
         self.options_dockWidget = QDockWidget(self)
         self.options_dockWidget.setWidget(self.options_frame)
         self.options_dockWidget.setFeatures(QDockWidget.NoDockWidgetFeatures)
+        self.options_dockWidget.setTitleBarWidget(QWidget(self.options_dockWidget))
 
         self.slam_plot_dockWidget = QDockWidget(self)
         self.slam_plot_dockWidget.setWidget(self.slam_results_plot)
@@ -453,6 +458,7 @@ class MainWindow(QMainWindow):
         self.widget = QWidget()
         self.view_layout = QVBoxLayout()
         self.view_layout.addWidget(self.view_real)
+        self.view_layout.addWidget(self.view_sim)
         self.view_layout.setContentsMargins(0, 0, 0, 0)
         self.widget.setLayout(self.view_layout)
         self.setCentralWidget(self.widget)
@@ -460,10 +466,10 @@ class MainWindow(QMainWindow):
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # add the dock widgets, options on the top, plots tabified on the right
-        self.addDockWidget(Qt.TopDockWidgetArea, self.options_dockWidget)
         self.addDockWidget(Qt.RightDockWidgetArea, self.slam_plot_dockWidget)
         self.addDockWidget(Qt.RightDockWidgetArea, self.feature_graph_dockWidget)
         self.tabifyDockWidget(self.slam_plot_dockWidget, self.feature_graph_dockWidget)
+        self.addDockWidget(Qt.TopDockWidgetArea, self.options_dockWidget)
         self.slam_plot_dockWidget.raise_()
 
         # window settings (size, stylesheet, ...)
@@ -474,7 +480,7 @@ class MainWindow(QMainWindow):
         self.showFullScreen()
         self.resize_widgets()
 
-        # for some weird reason this needs to be added later else python crashes on my mac (only true for GLScatterPlotItem and GLImageItem)
+        # hint: for some weird reason this needs to be added later else python crashes on my mac (only true for GLScatterPlotItem and GLImageItem)
         self.slam_results_plot.addItem(self.worldpoint_plot)
         # add legend to plot, fails due to GLViewWidget not having 'scene' attribute
         # legend = pg.LegendItem()
@@ -500,20 +506,22 @@ class MainWindow(QMainWindow):
         self.screen_height = self.height()
         self.screen_width = self.width()
         print("Window size: " + str(self.screen_width) + "x" + str(self.screen_height))
+        options_height_ratio = 0.05
         # self.options_frame.setFixedSize(1920,120)
         # self.options_dockWidget.setFixedSize(1920,120)
         # self.view_real.setMaximumSize(960,960)
         # self.view_real.setMinimumHeight(960)
         # self.slam_results_plot.resize(960,960)
         # self.feature_graph_window.resize(960,960)
-        self.widget.setFixedSize(self.screen_width / 2, self.screen_height - 120)
-        self.options_frame.setBaseSize(self.screen_width, 120)
-        self.options_dockWidget.setBaseSize(self.screen_width, 120)
+        self.widget.setFixedSize(self.screen_width / 2, self.screen_height * (1-options_height_ratio))
+        #self.widget.move(0,self.screen_height * options_height_ratio)
+        self.options_frame.resize(self.screen_width, self.screen_height * options_height_ratio)
+        self.options_dockWidget.resize(self.screen_width, self.screen_height * options_height_ratio)
         # self.options_frame.setMinimumHeight(120)
         # self.options_dockWidget.setMinimumHeight(120)
-        self.slam_results_plot.resize(self.screen_width / 2, self.screen_height - 120)
+        self.slam_results_plot.resize(self.screen_width / 2, self.screen_height * (1-options_height_ratio))
         self.feature_graph_window.resize(
-            self.screen_width / 2, self.screen_height - 120
+            self.screen_width / 2, self.screen_height * (1-options_height_ratio)
         )
 
     def keyPressEvent(self, QKeyEvent):

@@ -456,5 +456,6 @@ class EngineORB:
     def update_sim_camera(self):
         # update the camera of the simulation real world camera position measurement
         # unnecessary atm, since simulation view is not displayed
-        self.sofa_sim.root.camera.position = self.cam_pos
-        self.sofa_sim.root.camera.orientation = self.cam_ori
+        # self.sofa_sim.root.camera.position = self.cam_pos
+        # self.sofa_sim.root.camera.orientation = self.cam_ori
+        return
