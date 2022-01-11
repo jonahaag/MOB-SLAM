@@ -13,18 +13,6 @@ import sys
 import qdarkstyle
 
 
-class SecondWindow(QMainWindow):
-    def __init__(self):
-        super(SecondWindow, self).__init__()
-        self.sofa_sim = SofaSim()  # class to hold the scene
-        self.sofa_sim.init_sim()  # initialize the scene
-        self.view_sim = SofaGLViewer(
-            sofa_visuals_node=self.sofa_sim.root, camera=self.sofa_sim.root.camera
-        )
-        # self.setCentralWidget(self.view_sim)
-        # self.setWindowTitle("Simulated scene")
-
-
 class EmittingStream(QObject):
     textWritten = Signal(str)
 
@@ -232,7 +220,7 @@ class CustomDialog(QDialog):
 
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, mode):
         super(MainWindow, self).__init__()
 
         # class to hold the scene, simulation representing the real world
@@ -271,14 +259,6 @@ class MainWindow(QMainWindow):
         )
         self.sofa_sim.animation_end.connect(self.view_sim.update)
 
-        # font and background settings, stylesheets
-        # self.font_size = 20
-        # self.font = 'Helvetica'
-        # self.background_color = 'black'
-        # self.text_color = 'white'
-        self.colortheme = "dark"
-        self.buttonstyle_not_clicked = "QPushButton {color:white}"
-        self.buttonstyle_clicked = "QPushButton {color:red}"
         # which parts of the sofa model to display initially, here only the visual model
         self.visual_flags = [
             True,
@@ -344,9 +324,10 @@ class MainWindow(QMainWindow):
         # display graph item ontop of image
         self.graph_item.setZValue(10)
         # self.feature_graph_viewbox.setContentsMargins(0,0,0,0)
-        self.feature_graph_window.setBackground(background=None)
         self.skip_counter_network = 0
         self.skip_images_network = 20
+        self.is_extracting_graph = True
+        self.real_world.animation_end.connect(self.extract_network)
 
         # install the custom output stream
         sys.stdout = EmittingStream(textWritten=self.normalOutputWritten)
@@ -400,6 +381,7 @@ class MainWindow(QMainWindow):
         # add checkboxes inside a horizontal layout
         self.networkx_checkbox = QCheckBox()
         self.networkx_checkbox.setText("Extract Networkx Graph")
+        self.networkx_checkbox.setChecked(True)
         self.networkx_checkbox.stateChanged.connect(self.on_networkx_checkbox_change)
         self.colormode_checkbox = QCheckBox()
         self.colormode_checkbox.setText("Darkmode")
@@ -426,59 +408,7 @@ class MainWindow(QMainWindow):
         self.options_frame = QFrame()
         self.options_frame.setLayout(self.options_layout)
 
-        # add grid as main layout, stretch rows and columns
-        # self.main_grid = QGridLayout()
-        # self.main_grid.setRowStretch(0, 1)
-        # self.main_grid.setRowStretch(1, 1)
-        # self.main_grid.setColumnStretch(0,1)
-        # self.main_grid.setColumnStretch(1,1)
-        # self.main_grid.addWidget(self.view_real, 0, 0)
-        # self.main_grid.addWidget(self.slam_results_plot, 0, 1)
-        # self.main_grid.addWidget(self.feature_graph_window, 1, 0)
-        # self.main_grid.addWidget(self.options_frame,1,1)
-        # self.main_grid.setContentsMargins(0,0,0,0)
-        # self.main_grid.setSpacing(1)
-
-        self.options_dockWidget = QDockWidget(self)
-        self.options_dockWidget.setWidget(self.options_frame)
-        self.options_dockWidget.setFeatures(QDockWidget.NoDockWidgetFeatures)
-        self.options_dockWidget.setTitleBarWidget(QWidget(self.options_dockWidget))
-
-        self.slam_plot_dockWidget = QDockWidget(self)
-        self.slam_plot_dockWidget.setWidget(self.slam_results_plot)
-        self.slam_plot_dockWidget.setTitleBarWidget(QLabel(""))
-        self.slam_plot_dockWidget.setWindowTitle("SLAM Results")
-
-        self.feature_graph_dockWidget = QDockWidget(self)
-        self.feature_graph_dockWidget.setWidget(self.feature_graph_window)
-        self.feature_graph_dockWidget.setTitleBarWidget(QLabel(""))
-        self.feature_graph_dockWidget.setWindowTitle("Feature Graph Plot")
-
-        # create QWidget to contain the first level grid layout, set as central widget in main window
-        self.widget = QWidget()
-        self.view_layout = QVBoxLayout()
-        self.view_layout.addWidget(self.view_real)
-        self.view_layout.addWidget(self.view_sim)
-        self.view_layout.setContentsMargins(0, 0, 0, 0)
-        self.widget.setLayout(self.view_layout)
-        self.setCentralWidget(self.widget)
-        # self.setCentralWidget(self.view_real)
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
-        # add the dock widgets, options on the top, plots tabified on the right
-        self.addDockWidget(Qt.RightDockWidgetArea, self.slam_plot_dockWidget)
-        self.addDockWidget(Qt.RightDockWidgetArea, self.feature_graph_dockWidget)
-        self.tabifyDockWidget(self.slam_plot_dockWidget, self.feature_graph_dockWidget)
-        self.addDockWidget(Qt.TopDockWidgetArea, self.options_dockWidget)
-        self.slam_plot_dockWidget.raise_()
-
-        # window settings (size, stylesheet, ...)
-        self.setWindowTitle("SLAM Dashboard")
-        self.setStyleSheet(
-            qdarkstyle.load_stylesheet(qdarkstyle.dark.palette.DarkPalette)
-        )
-        self.showFullScreen()
-        self.resize_widgets()
+        self.create_layout(mode=mode)
 
         # hint: for some weird reason this needs to be added later else python crashes on my mac (only true for GLScatterPlotItem and GLImageItem)
         self.slam_results_plot.addItem(self.worldpoint_plot)
@@ -502,27 +432,89 @@ class MainWindow(QMainWindow):
         self.mat_engine.set_sim(self.sofa_sim)
         self.mat_engine.set_main_window(self)
 
-    def resize_widgets(self):
-        self.screen_height = self.height()
-        self.screen_width = self.width()
-        print("Window size: " + str(self.screen_width) + "x" + str(self.screen_height))
-        options_height_ratio = 0.05
-        # self.options_frame.setFixedSize(1920,120)
-        # self.options_dockWidget.setFixedSize(1920,120)
-        # self.view_real.setMaximumSize(960,960)
-        # self.view_real.setMinimumHeight(960)
-        # self.slam_results_plot.resize(960,960)
-        # self.feature_graph_window.resize(960,960)
-        self.widget.setFixedSize(self.screen_width / 2, self.screen_height * (1-options_height_ratio))
-        #self.widget.move(0,self.screen_height * options_height_ratio)
-        self.options_frame.resize(self.screen_width, self.screen_height * options_height_ratio)
-        self.options_dockWidget.resize(self.screen_width, self.screen_height * options_height_ratio)
-        # self.options_frame.setMinimumHeight(120)
-        # self.options_dockWidget.setMinimumHeight(120)
-        self.slam_results_plot.resize(self.screen_width / 2, self.screen_height * (1-options_height_ratio))
-        self.feature_graph_window.resize(
-            self.screen_width / 2, self.screen_height * (1-options_height_ratio)
-        )
+    def create_layout(self, mode):
+        if mode == "main":
+            # add grid as main layout, stretch rows and columns
+            self.main_grid = QGridLayout()
+            self.main_grid.setRowStretch(0, 1)
+            self.main_grid.setRowStretch(1, 5)
+            self.main_grid.setRowStretch(2, 5)
+            self.main_grid.setColumnStretch(0,1)
+            self.main_grid.setColumnStretch(1,1)
+            self.main_grid.addWidget(self.options_frame,0,0,1,2)
+            self.main_grid.addWidget(self.view_real, 1, 0)
+            self.main_grid.addWidget(self.view_sim, 2, 0)
+            self.main_grid.addWidget(self.slam_results_plot, 1, 1)
+            self.main_grid.addWidget(self.feature_graph_window, 2, 1)
+            self.main_grid.setContentsMargins(0,0,0,0)
+            self.main_grid.setSpacing(1)
+
+            # create QWidget to contain the first level grid layout, set as central widget in main window
+            self.widget = QWidget()
+            self.widget.setLayout(self.main_grid)
+            self.setCentralWidget(self.widget)
+            self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+            # window settings (size, stylesheet, ...)
+            self.setWindowTitle("SLAM Dashboard")
+            self.colortheme = "dark"
+            if self.colortheme == "dark":
+                self.set_dark_theme()
+            else:
+                self.set_light_theme()
+            self.showFullScreen()
+
+        elif mode == "test":
+            self.options_dockWidget = QDockWidget(self)
+            self.options_dockWidget.setWidget(self.options_frame)
+            self.options_dockWidget.setFeatures(QDockWidget.NoDockWidgetFeatures)
+            self.options_dockWidget.setTitleBarWidget(QWidget(self.options_dockWidget))
+
+            self.slam_plot_dockWidget = QDockWidget(self)
+            self.slam_plot_dockWidget.setWidget(self.slam_results_plot)
+            self.slam_plot_dockWidget.setWindowTitle("SLAM Results")
+
+            self.feature_graph_dockWidget = QDockWidget(self)
+            self.feature_graph_dockWidget.setWidget(self.feature_graph_window)
+            self.feature_graph_dockWidget.setWindowTitle("Feature Graph Plot")
+
+            # create QWidget to contain the first level grid layout, set as central widget in main window
+            self.widget = QWidget()
+            self.view_layout = QVBoxLayout()
+            self.view_layout.addWidget(self.view_real)
+            self.view_layout.setContentsMargins(0, 0, 0, 0)
+            self.widget.setLayout(self.view_layout)
+            self.setCentralWidget(self.widget)
+            self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+            # add the dock widgets, options on the top, plots tabified on the right
+            self.addDockWidget(Qt.RightDockWidgetArea, self.slam_plot_dockWidget)
+            self.addDockWidget(Qt.RightDockWidgetArea, self.feature_graph_dockWidget)
+            self.tabifyDockWidget(self.slam_plot_dockWidget, self.feature_graph_dockWidget)
+            self.addDockWidget(Qt.TopDockWidgetArea, self.options_dockWidget)
+            self.slam_plot_dockWidget.raise_()
+
+            # window settings (size, stylesheet, ...)
+            self.setWindowTitle("SLAM Dashboard")
+            self.colortheme = "dark"
+            if self.colortheme == "dark":
+                self.set_dark_theme()
+            else:
+                self.set_light_theme()
+            self.showFullScreen()
+
+            # resize widgets
+            self.screen_height = self.height()
+            self.screen_width = self.width()
+            print("Window size: " + str(self.screen_width) + "x" + str(self.screen_height))
+            options_height_ratio = 0.05
+            self.widget.setFixedSize(self.screen_width / 2, self.screen_height * (1-options_height_ratio))
+            self.options_frame.resize(self.screen_width, self.screen_height * options_height_ratio)
+            self.options_dockWidget.resize(self.screen_width, self.screen_height * options_height_ratio)
+            self.slam_results_plot.resize(self.screen_width / 2, self.screen_height * (1-options_height_ratio))
+            self.feature_graph_window.resize(
+                self.screen_width / 2, self.screen_height * (1-options_height_ratio)
+            )
 
     def keyPressEvent(self, QKeyEvent):
         if QKeyEvent.key() == Qt.Key_Space:
@@ -615,7 +607,7 @@ class MainWindow(QMainWindow):
         self.real_world.root.ellipsoid.surfaceConstraint.pressure.value = value
         # probably do this for the sim as well in the future (right now only the sim that is supposed to be the real world)
 
-    def extract_network(self):        
+    def extract_network(self):     
         if self.skip_counter_network == self.skip_images_network:
             self.skip_counter_network = 0
             nxs.draw_img_and_graph(
@@ -629,39 +621,47 @@ class MainWindow(QMainWindow):
             self.skip_counter_network += 1
 
     def on_networkx_checkbox_change(self):
-        if self.mat_engine.is_extracting_graph:
+        if self.is_extracting_graph:
             self.real_world.animation_end.disconnect(self.extract_network)
         else:
             self.real_world.animation_end.connect(self.extract_network)
-        self.mat_engine.is_extracting_graph = not self.mat_engine.is_extracting_graph
+        self.is_extracting_graph = not self.is_extracting_graph
 
     def on_colormode_checkbox_change(self):
         if self.colortheme == "dark":
             self.colortheme = "light"
-            self.setStyleSheet(
-                qdarkstyle.load_stylesheet(qdarkstyle.light.palette.LightPalette)
-            )
-            self.feature_graph_window.setBackground(background="#CED1D4")
-            self.slam_results_plot.setBackgroundColor("#CED1D4")
-            self.view_real.set_background_color([1.0, 1.0, 1.0, 1.0])
-            self.buttonstyle_not_clicked = "QPushButton {color:#19232D}"
-            self.buttonstyle_clicked = "QPushButton {color:red}"
-            self.text_edit_console.setStyleSheet(
-                "QTextEdit {background-color:#CED1D4; color:#19232D}"
-            )
+            self.set_light_theme()
         else:
             self.colortheme = "dark"
-            self.setStyleSheet(
-                qdarkstyle.load_stylesheet(qdarkstyle.dark.palette.DarkPalette)
-            )
-            self.feature_graph_window.setBackground(background=None)
-            self.slam_results_plot.setBackgroundColor("#19232D")
-            self.view_real.set_background_color([25 / 255, 35 / 255, 45 / 255, 1])
-            self.buttonstyle_not_clicked = "QPushButton {color:white}"
-            self.buttonstyle_clicked = "QPushButton {color:red}"
-            self.text_edit_console.setStyleSheet(
-                "QTextEdit {background-color:#19232D; color:white}"
-            )
+            self.set_dark_theme()
+            
+    def set_light_theme(self):
+        self.setStyleSheet(
+            qdarkstyle.load_stylesheet(qdarkstyle.light.palette.LightPalette)
+        )
+        self.feature_graph_window.setBackground("#CED1D4")
+        self.slam_results_plot.setBackgroundColor("#CED1D4")
+        self.view_real.set_background_color([206/255, 209/255, 212/255, 1])
+        self.view_sim.set_background_color([206/255, 209/255, 212/255, 1])
+        self.buttonstyle_not_clicked = "QPushButton {color:#19232D}"
+        self.buttonstyle_clicked = "QPushButton {color:red}"
+        self.text_edit_console.setStyleSheet(
+            "QTextEdit {background-color:white; color:#19232D}"
+        )
+
+    def set_dark_theme(self):
+        self.setStyleSheet(
+            qdarkstyle.load_stylesheet(qdarkstyle.dark.palette.DarkPalette)
+        )
+        self.feature_graph_window.setBackground("#37414F")
+        self.slam_results_plot.setBackgroundColor("#37414F")
+        self.view_real.set_background_color([55/255, 65/255, 79/255, 1])
+        self.view_sim.set_background_color([55/255, 65/255, 79/255, 1])
+        self.buttonstyle_not_clicked = "QPushButton {color:white}"
+        self.buttonstyle_clicked = "QPushButton {color:red}"
+        self.text_edit_console.setStyleSheet(
+            "QTextEdit {background-color:#19232D; color:white}"
+        )  
 
     def __del__(self):
         # Restore sys.stdout

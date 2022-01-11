@@ -76,8 +76,6 @@ class EngineORB:
         self.skip_counter = skip_images_init  # start immediately
         self.is_mapping = False
         self.is_initialized = False
-        self.build_network = False
-        self.is_extracting_graph = False
         self.slam_step = 0
         self.sim_step = 0
         self.positions = []
@@ -404,20 +402,6 @@ class EngineORB:
         if QKeyEvent.key() == Qt.Key_H:
             if self.mode == "tofile" and self.trajectory_path == self.navigation_path:
                 self.write_camera_position()
-
-        if QKeyEvent.key() == Qt.Key_N:  # N for network
-            if not self.build_network:
-                self.build_network = True
-                img = self.viewer.get_screen_shot()
-                cv2.imshow("image", img)
-                cv2.waitKey(0)
-                cv2.destroyWindow("image")
-                cv2.waitKey(1)
-                print(len(img))
-                print("Start Network")
-            else:
-                self.build_network = False
-                print("Stop Network")
 
         if QKeyEvent.key() == Qt.Key_L:
             pressure = self.real_world.root.ellipsoid.surfaceConstraint.pressure.value
