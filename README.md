@@ -60,6 +60,50 @@ Please refer to the [docs]() for more information.
 
 ## How to get going / Demo / Tutorial
 
+To open the GUI, step into the source folder and simply run `main.py`, e.g. via
+
+```bash
+# pwd==.../Model_based_SLAM
+cd src
+python3 main.py
+```
+
+or execute the shell script with
+
+```bash
+# pwd==.../Model_based_SLAM
+./run.sh
+```
+First a popup dialog will open, allowing you to chose the mode and SLAM version.
+The mode refers to two different layout options of the GUI:
+
+* `main`: the intended final layout consisting of
+
+	* option bar (very top)
+	* real world view (top left)
+	* simulated view (bottom left)
+	* SLAM results plot (top right)
+	* feature graph window (bottom right)
+	
+	In this mode all the widgets are fixed in space and all the relevant information is visible at all times.
+
+* `test`: a layout that allow for more user configuration consisting of
+
+	* option bar (very top)
+	* real world view (left)
+	* SLAM results plot (right, currently in the front)
+	* feature graph window (right, in the back)
+
+	This mode was designed specifically for the considered case, that is real world and simulated environment are basically the same.
+	Here the two plots on the right are (un)dockable and can be resized and reorganized to some degree.
+
+The two options for the SLAM version refer to the algorithm that is used for the scene reconstruction and position estimation:
+
+* `orb`: the standard ORB-SLAM implemented in MATLAB
+* `model-based`: the Model-based SLAM to keep track of deformations
+
+Note: Keep in mind that the Model-based SLAM, at least at its current stage, is quite slow compared to ORB-SLAM and does not guarantee good results in the presence of large deformations.	
+
 ## Open issues
 
 Please see the issues section of the GitHub repository for existing issues and bugs that have not be fully resolved yet.
