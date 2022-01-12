@@ -10,7 +10,9 @@ This repository contains a graphical user interface that enables
 	1. track the camera movement within the simulation 
 	1. generate a map of the scene
 	1. incorporate deformation information based on a parallel simulation
-	
+
+![](images/main_gui2.png)
+
 It is designed to be modular and easily extensible and aims at providing a reliable and replicable code base for future work on this topic.
 
 The model-based approach enables the SLAM algorithm to produce good results even in the presence of deformations e.g. caused by external forces or changes in volume.
@@ -75,6 +77,9 @@ or execute the shell script with
 ./run.sh
 ```
 First a popup dialog will open, allowing you to chose the mode and SLAM version.
+
+![](images/welcome_dialogue.png)
+
 The mode refers to two different layout options of the GUI:
 
 * `Main`: the intended final layout consisting of
