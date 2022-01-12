@@ -78,7 +78,7 @@ or execute the shell script with
 ```
 First a popup dialog will open, allowing you to chose the mode and SLAM version.
 
-![](images/welcome_dialogue.png)
+<img src="images/welcome_dialogue.jpg" alt="" width="200"/>
 
 The mode refers to two different layout options of the GUI:
 
