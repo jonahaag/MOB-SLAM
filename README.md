@@ -11,7 +11,7 @@ This repository contains a graphical user interface that enables
 	1. generate a map of the scene
 	1. incorporate deformation information based on a parallel simulation
 
-![](images/gui.gif)
+![](images/main_gui2.png)
 
 It is designed to be modular and easily extensible and aims at providing a reliable and replicable code base for future work on this topic.
 
