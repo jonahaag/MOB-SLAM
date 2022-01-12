@@ -3,48 +3,64 @@
 MobSLAM is a Simultaneous Localization and Mapping system for deformable environments.
 This repository contains a graphical user interface that enables 
 
-- the display of a [SOFA simulation](https://www.sofa-framework.org)
-- different options to record and select different paths as well as a keyboard controller for the simulation camera
-- different options to deform the simulated object
-- use of a Simultaneous Localization and Mapping (SLAM) algorithm to 
+* the display of a [SOFA simulation](https://www.sofa-framework.org)
+* different options to record and select different paths as well as a keyboard controller for the simulation camera
+* different options to deform the simulated object
+* use of a Simultaneous Localization and Mapping (SLAM) algorithm to 
 	1. track the camera movement within the simulation 
-	2. generate a map of the scene
-	3. incorporate deformation information based on the parallel simulation
+	1. generate a map of the scene
+	1. incorporate deformation information based on a parallel simulation
 	
 It is designed to be modular and easily extensible and aims at providing a reliable and replicable code base for future work on this topic.
 
 The model-based approach enables the SLAM algorithm to produce good results even in the presence of deformations e.g. caused by external forces or changes in volume.
 The aim of this work is to provide a more reliable geometric representation of deformable structures based on a monocular camera by directly incorporating information about the deformation into the mapping.
+
 The basic idea is to run a parallel FEM simulation predicting the deformation based on measurements and then use the simulated surface information, i.e. vertex positions, to continuously update the SLAM results.
-At this stage there is no distinction between the "real world" and the simulation which basically equals perfect predictions of the deformation.
+At this stage there is no distinction between the "real world" and the simulation which basically corresponds to perfect predictions of the deformation.
 This is obviously almost impossible to achieve in real life which is why the interface is designed to easily separate between the two views - more information on this can be found below.
 This repository was created as part of the research area B1 concerning [Intraoperative Navigation of Multimodal sensors](https://www.grk2543.uni-stuttgart.de/en/research/b-modeling-and-classification/b1-modeling/) of the [RTG 2543: Intraoperative Multisensory Tissue Differentiation in Oncology](https://www.grk2543.uni-stuttgart.de/en/) at the [Institute for System Dynamics (ISYS)](https://www.isys.uni-stuttgart.de/en/), University of Stuttgart, Germany.
 
 It builds on top of [QSofaGLViewTools](https://github.com/psomers3/QSofaGLViewTools) and [MATLAB Monocular Visual Simultaneous Localization and Mapping](https://www.mathworks.com/help/vision/ug/monocular-visual-simultaneous-localization-and-mapping.html).
 
 ## Repository overview
-A small overview of recent changes of the GUI to improve user experience:
 
-1. Docker Widget Layout consisting of: 
-	- Options bar at the top (fixed position and size)
-	- Sofa GL Viewer showing the simulation on the left side (right now also fixed position and size)
-	- SLAM Results Plot and Feature Graph Plot as a Tab Widgets (can be undocked and resized, design to be improved). Double click on the top of the widget to (un)dock or drag and drop
+The source code as well as all relevant information can be found in the `src` folder.
+It is split up into:
 
-2. Light Mode / Dark Mode with qdarkstyle, though some things need to be improved
-3. Slider to deform the Sofa object and possibly test future versions of the Model-based approach
-4. Settings Dialog with some initial ideas regarding what might be interesting to play around with, some visual settings
+* the main script [main.py](src/main.py) to run the GUI
+* the subfolder `gui` containing
+	* [mainwindow.py](src/gui/mainwindow.py): contains all the GUI elements (Widgets, Layouts, interactive elements,...) as well as the SOFA viewer and an instance of `EngineORB`
+	* [orb.py](src/gui/orb.py): contains the class that is responsible for transformation and exchange of data between the SLAM (MATLAB) and the SOFA simulation (Python)
+	* [plotter.py](src/gui/plotter.py): contains functions to plot the results using [pyqtgraph](https://pyqtgraph.readthedocs.io/en/latest/)
+* the subfolder `mesh` containing some basic mesh files and texture images that were used for testing
+* the subfolder `slam` containing
+	* the MATLAB implementation of ORB-SLAM
+	* the added functions and scripts for projection and forward prediction based on the simulated deformation, i.e. the core part of the model-based SLAM
+* the subfolder `sofaviewer` containing a past version of [psomers3/QSofaGLViewTools](https://github.com/psomers3/QSofaGLViewTools):
+	> A small PyQt widget library for viewing SOFA simulation cameras and controlling them.
+* the subfolder `feature_graph` which 
+	* uses [opencv-python](https://pypi.org/project/opencv-python/) to extract ORB features of the current image
+	* creates a [NetworkX](https://networkx.org) graph with the features as nodes and user-setting-based edges
+	* displays that graph on top of the image
+
+Please refer to the [docs]() for more information.
 
 ## Prerequisites
 
-1. Sofa Python3 bindings
-2. qtpy, PyQt5
-3. pyqtgraph
-4. networkx
-5. cv2
-6. qdarkstyle
+1. Python, implemented in 3.7, not tested in other versions
+1. [MATLAB](https://www.mathworks.com/products/matlab.html), implemented in 2020b, not tested with older versions
+1. [Sofa](https://www.sofa-framework.org) with Python3 bindings
+1. [qtpy](https://pypi.org/project/QtPy/), [PyQt5](https://pypi.org/project/PyQt5/)
+1. [pyqtgraph](https://pyqtgraph.readthedocs.io/en/latest/)
+1. [NetworkX](https://networkx.org)
+1. [cv2](https://pypi.org/project/opencv-python/)
+1. [qdarkstyle](https://qdarkstylesheet.readthedocs.io/en/latest/)
+
 
 ## How to get going / Demo / Tutorial
 
-## Docker container
+## Open issues
 
-## Further resources
+Please see the issues section of the GitHub repository for existing issues and bugs that have not be fully resolved yet.
+A major bottleneck of the RSE infrastructure is the lack of proper testing, poor error handling, especially between MATLAB and Python, and missing automation regarding CI/GitHub workflows.
