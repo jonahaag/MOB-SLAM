@@ -1,7 +1,5 @@
 ## GUI layout
 
-Main Mode | Test Mode
-- | - 
 <img src="../images/main_gui1.png" alt="" width="300"/> | <img src="../images/test_gui.png" alt="" width="300"/>
 
 ### Option Bar
