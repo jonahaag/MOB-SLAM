@@ -16,7 +16,7 @@ or execute the shell script with
 ```
 First a popup dialog will open, allowing you to chose the mode and SLAM version.
 
-<img src="images/welcome_dialogue.png" alt="" width="300"/>
+<img src="images/welcome_dialog.png" alt="" width="300"/>
 
 The mode refers to two different layout options of the GUI:
 
