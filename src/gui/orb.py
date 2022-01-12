@@ -16,7 +16,6 @@ import csv
 import os
 import math
 from . import plotter
-import cv2
 
 
 def compute_trajectory(keypoints):
@@ -52,6 +51,7 @@ def compute_trajectory(keypoints):
 class EngineORB:
     def __init__(
         self,
+        slam,
         mat_dir,
         skip_images_init=2,
         skip_images_main=0,
@@ -71,6 +71,7 @@ class EngineORB:
         # Go to slam directory
         self.mat.cd(mat_dir, nargout=0)
         self.mat_dir = mat_dir
+        self.slam = slam
         self.skip_images = skip_images_init
         self.skip_images_main = skip_images_main
         self.skip_counter = skip_images_init  # start immediately
@@ -197,6 +198,10 @@ class EngineORB:
             }
             savemat(os.path.join(self.mat_dir, "initI.mat"), initdic)
             self.mat.initialize_slam(nargout=0)
+            if self.slam == "orb":
+                self.mat.workspace["doProjections"] = 0
+            elif self.slam == "mob":
+                self.mat.workspace["doProjections"] = 1
         else:
             initdic = {"currI": image}
             savemat(os.path.join(self.mat_dir, "currI.mat"), initdic)
@@ -272,6 +277,10 @@ class EngineORB:
                 list(self.mat.workspace["sofaGroundTruth_pos_slam"])
             ),
         )
+        if self.mat.workspace["rmse1"] < self.mat.workspace["rmse1"]:
+            print(f'Absolute RMSE for key frame trajectory (m): {self.mat.workspace["rmse1"]}')
+        else:
+            print(f'Absolute RMSE for key frame trajectory (m): {self.mat.workspace["rmse2"]}')
 
     def start_slam(self):
         # print("Start SLAM")

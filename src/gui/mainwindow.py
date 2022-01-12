@@ -222,7 +222,7 @@ class CustomDialog(QDialog):
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, mode):
+    def __init__(self, mode, slam):
         super(MainWindow, self).__init__()
 
         # class to hold the scene, simulation representing the real world
@@ -424,6 +424,7 @@ class MainWindow(QMainWindow):
         current_dir = os.path.dirname(__file__)
         mat_dir = os.path.join(current_dir, "../slam/")
         self.mat_engine = EngineORB(
+            slam=slam,
             mat_dir=mat_dir,
             skip_images_init=4,
             skip_images_main=10,

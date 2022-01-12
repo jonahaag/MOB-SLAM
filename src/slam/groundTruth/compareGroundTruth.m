@@ -31,10 +31,10 @@ rmse2 = sqrt(mean( sum((locations - sofaGroundTruth_pos_slam2).^2, 2) ));
 
 if rmse1 < rmse2
     sofaGroundTruth_pos_slam = sofaGroundTruth_pos_slam1;
-    disp(['Absolute RMSE for key frame trajectory (m): ', num2str(rmse1)]);
+    %disp(['Absolute RMSE for key frame trajectory (m): ', num2str(rmse1)]);
 else
     sofaGroundTruth_pos_slam = sofaGroundTruth_pos_slam2;
-    disp(['Absolute RMSE for key frame trajectory (m): ', num2str(rmse2)]);
+    %disp(['Absolute RMSE for key frame trajectory (m): ', num2str(rmse2)]);
 end
 
 %% Plot the actual camera trajectory
