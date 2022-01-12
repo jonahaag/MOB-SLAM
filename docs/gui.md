@@ -2,7 +2,7 @@
 
 Main Mode | Test Mode
 - | - 
-<img src="i../images/main_gui1.png" alt="" width="300"/> | <img src="i../images/test_gui.png" alt="" width="300"/>
+<img src="../images/main_gui1.png" alt="" width="300"/> | <img src="../images/test_gui.png" alt="" width="300"/>
 
 ### Option Bar
 
