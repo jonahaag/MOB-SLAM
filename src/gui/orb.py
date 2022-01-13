@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Feb 22 11:55:53 2021
-
-@author: jona
-"""
 from qtpy.QtCore import *
 from qtpy.QtWidgets import *
 import matlab.engine
@@ -19,6 +14,14 @@ from . import plotter
 
 
 def compute_trajectory(keypoints):
+    """Function to compute a trajectory out of a set of keypoints using linear interpolation
+
+    Args:
+        keypoints (list): Contains the time (step), position, and orientation of a keypoint in each row
+
+    Returns:
+        np.array: Position and orientation at each time step between t=0 and last keypoint
+    """
     # get list of keytimes and corresponding positions/orientations
     # returns np.arrays of complete trajectory, connecting all keypoints and reaching them at the specified times
     key_times = np.array(keypoints)[:, 0]
@@ -49,6 +52,9 @@ def compute_trajectory(keypoints):
 
 
 class EngineORB:
+    """
+    Class to handle the data transfer between SOFA simulation (Python) and SLAM (MATLAB)
+    """
     def __init__(
         self,
         slam,
@@ -58,6 +64,16 @@ class EngineORB:
         mode="fromfile",
         trajectory_path="sofaviewer/trajectories/navigation/",
     ):
+        """Initalization function for EngineORB
+
+        Args:
+            slam (str): Switch between ORB-SLAM ("orb") and Model-based SLAM ("mob")
+            mat_dir (str): Path to MATLAB SLAM root directory
+            skip_images_init (int, optional): Number of simulation steps to skip between two images during the initalization phase. Defaults to 2.
+            skip_images_main (int, optional): Number of simulation steps to skip between two images during the main phase. Defaults to 0.
+            mode (str, optional): Navigation mode. Defaults to "fromfile".
+            trajectory_path (str, optional): Path to directory to write/read trajectory. Defaults to "sofaviewer/trajectories/navigation/".
+        """
         print("Starting MATLAB engine ...")
         # Start matlab engine
         self.mat = matlab.engine.start_matlab()  # "-desktop -r 'format short'"
@@ -137,12 +153,22 @@ class EngineORB:
             pass
 
     def set_viewer(self, viewer: SofaGLViewer):
+        """Function to set OpenGL viewer of the SOFA simulation
+
+        Args:
+            viewer (SofaGLViewer): OpenGL viewer of the SOFA simulation
+        """
         self.viewer = viewer
         self._viewer_set = True
         self.viewer.key_pressed.connect(self.keyPressEvent)
         # self.viewer.key_released.connect(self.keyReleaseEvent)
 
     def set_image_source(self, sim1: SofaSim):
+        """Function to set the real world camera
+
+        Args:
+            sim1 (SofaSim): SOFA simulation
+        """
         self.real_world = sim1
         self.camera = sim1.root.camera
         self.cam_pos = self.camera.position
@@ -150,25 +176,46 @@ class EngineORB:
         self._world_set = True
 
     def set_sim(self, sim2: SofaSim):
+        """Function to set the simulated environment used for predicting the deformation
+
+        Args:
+            sim2 (SofaSim): SOFA simulation
+        """
         self.sofa_sim = sim2
         self._sim_set = True
 
     def set_main_window(self, window: QMainWindow):
+        """Function to set the main window
+
+        Args:
+            window (QMainWindow): Main window
+        """
         self.main_window = window
         self._main_window_set = True
 
     def update_sim_step(self):
-        # keep track of number of simulation steps
-        # function call needed to connect the signal
+        """Function to keep track of simulation steps. Function call needed to connnect signal.
+        """
         self.sim_step += 1
 
     def viewer_info(self, viewer_size, intrinsics):
+        """Function to write information about the viewer to class variables
+
+        Args:
+            viewer_size (tuple): (width, height) of the viewer
+            intrinsics (list): focal length and principal point of the viewer's camera
+        """
         self.viewer_size = viewer_size
         self.intrinsics = intrinsics
         self.width = self.viewer_size[0]
         self.height = self.viewer_size[1]
 
     def add_pos_to_gt(self, row):
+        """Function to add a camera pose (position and orientation) to ground truth list
+
+        Args:
+            row (int): Index of the pose
+        """
         # add new row if predetermined size is not sufficient
         if row < self.ground_truth_positions.shape[0]:
             self.ground_truth_positions[row] = self.cam_pos.value
@@ -182,6 +229,11 @@ class EngineORB:
             )
 
     def initialize_slam(self, image):
+        """Function to initialize the SLAM by calling the corresponding MATLAB functions
+
+        Args:
+            image (np.array): Image of the real world
+        """
         # use first image to initalize slam, then use every image to try to initialize the map
         self.slam_step += 1
         if self.slam_step == 1:
@@ -219,6 +271,11 @@ class EngineORB:
                 # self.pts = nxs.initialize_network_3D(self.mat.workspace['worldpoints'])
 
     def main_slam(self, image):
+        """Function to call the main loop of the SLAM in MATLAB
+
+        Args:
+            image (np.array): Image of the real world
+        """
         self.slam_step += 1
         maindic = {"currI": image}
         savemat(os.path.join(self.mat_dir, "currI.mat"), maindic)
@@ -256,6 +313,8 @@ class EngineORB:
             )
 
     def stop_slam(self):
+        """Function to call the MATLAB scripts to stop the SLAM and compare the ground truth
+        """
         # save ground truth of key frames as mat-file
         self.is_mapping = False
         self.real_world.animation_end.disconnect(
@@ -283,6 +342,8 @@ class EngineORB:
             print(f'Absolute RMSE for key frame trajectory (m): {self.mat.workspace["rmse2"]}')
 
     def start_slam(self):
+        """Function to connect the end of an simulation step to a SLAM update
+        """
         # print("Start SLAM")
         self.is_mapping = True
         self.real_world.animation_end.connect(
@@ -294,6 +355,8 @@ class EngineORB:
         )
 
     def start_sim(self):
+        """Function to connect the simulation start to corresponding navigation mode
+        """
         self.real_world.animation_start.connect(self.update_sim_step)
         self.real_world.animation_start.connect(self.update_sim_camera)
         # self.real_world.animation_start.connect(self.viewer.paintGL)
@@ -306,6 +369,8 @@ class EngineORB:
             # self.real_world.animation_end.connect(self.write_camera_position)
 
     def stop_sim(self):
+        """Function to write trajectory to file when the simulation is stopped and in "tofile" mode
+        """
         if self.mode == "tofile":
             if self.trajectory_path == self.navigation_path:
                 with open(
@@ -326,6 +391,8 @@ class EngineORB:
                     wr.writerows(self.orientations)
 
     def read_camera_position(self):
+        """Function to set the camera position to next predefined value
+        """
         if self.current_line < self.n_positions:
             self.cam_pos.value = self.positions[self.current_line, :]
             self.cam_ori.value = self.orientations[self.current_line, :]
@@ -333,6 +400,8 @@ class EngineORB:
             self.current_line += 1
 
     def enforce_trajectory(self):
+        """Function to set the camera position to follow a certain trajectory (cirle) before following the trajectory of the input file
+        """
         # # start with circle
         # if self.sim_step <= 50:
         #     self.cam_pos -= [0., 0.01, 0.]
@@ -363,6 +432,8 @@ class EngineORB:
             self.read_camera_position()
 
     def write_camera_position(self):
+        """Function to append current camera pose to list of poses
+        """
         if self.trajectory_path == self.navigation_path:
             keypoint = np.empty([1, 8])
             keypoint[0, 0] = self.sim_step
@@ -375,6 +446,11 @@ class EngineORB:
             self.orientations.append(list(self.cam_ori.value))
 
     def keyPressEvent(self, QKeyEvent):
+        """Function to map some keyboard inputs to actions
+
+        Args:
+            QKeyEvent: Key pressed event
+        """
         if QKeyEvent.key() == Qt.Key_Space:
             # if animating
             # stop slam, if running
@@ -421,6 +497,8 @@ class EngineORB:
             # print(self.real_world.root.ellipsoid.cavity.surfaceConstraint.pressure.value)
 
     def update_slam(self):
+        """Function to update the SLAM if enough simulation steps have gone by since the last update
+        """
         # at every animation_end-event, either do nothing or pass image
         # try initialization until map is initialized, then call main_slam
         if self.skip_counter == self.skip_images:
@@ -432,21 +510,9 @@ class EngineORB:
         else:
             self.skip_counter += 1
 
-    def map_prediction(self):
-        # input: slam_map, forces/simulation nodes
-        # projects new map points onto geometry
-        # updates position of previously-projected points based on simulated deformation
-        # output: new slam map
-        # just call matlab scripts as a start
-        sim_nodes = self.sofa_sim.root.ellipsoid.visual.VisualModel.position.value
-        # real_nodes = self.real_world.root.ellipsoid.visual.VisualModel.position.value
-        # diff = sim_nodes - real_nodes
-        # print(np.linalg.norm(diff, axis=0, keepdims=True))
-        nodedic = {"currentNodePositions": sim_nodes}
-        savemat(os.path.join(self.mat_dir, "currentNodePositions.mat"), nodedic)
-        self.mat.forward_predict_map_points(nargout=0)
-
     def update_sim_camera(self):
+        """Function to update the pose of the camera of the simulation view. Not properly implemented at the moment.
+        """
         # update the camera of the simulation real world camera position measurement
         # unnecessary atm, since simulation view is not displayed
         # self.sofa_sim.root.camera.position = self.cam_pos

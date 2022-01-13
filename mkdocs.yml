@@ -8,7 +8,10 @@ nav:
         - 'SLAM': 'slam.md'
         - 'Sofa Viewer': 'sofa_viewer.md'
         - 'Feature Graph': 'feature_graph.md'
-
+    - 'API Documentation':
+        - 'GUI': 'api/gui.md'
+        - 'EngineORB': 'api/orb.md'
+        - 'Feature Graph': 'api/feature_graph.md'
 repo_url: https://github.tik.uni-stuttgart.de/JHaag/Model_based_SLAM
 edit_uri: edit/main/docs
 site_author: Jonathan Haag
@@ -17,3 +20,5 @@ theme:
    name: readthedocs
    collapse_navigation : false
    prev_next_buttons_location: none
+plugins:
+    - mkdocstrings

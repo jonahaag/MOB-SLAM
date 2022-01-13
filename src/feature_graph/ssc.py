@@ -3,7 +3,6 @@ import math
 # https://github.com/BAILOOL/ANMS-Codes
 # should evenly distribute features across the image
 
-
 def ssc(keypoints, num_ret_points, tolerance, cols, rows):
     exp1 = rows + cols + 2 * num_ret_points
     exp2 = (
