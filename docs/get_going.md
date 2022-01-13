@@ -14,11 +14,11 @@ or execute the shell script with
 # pwd==.../Model_based_SLAM
 ./run.sh
 ```
-First a popup dialog will open, allowing you to chose the mode and SLAM version.
+First a popup dialog will open, allowing you to chose the mode consisting of the GUI layout, SLAM version, and navigation mode.
 
 <img src="images/welcome_dialog.png" alt="" width="300"/>
 
-The mode refers to two different layout options of the GUI:
+The two options for the GUI layout are:
 
 * `Main`: the intended final layout consisting of
 
@@ -27,7 +27,8 @@ The mode refers to two different layout options of the GUI:
 	* simulated view (bottom left)
 	* SLAM results plot (top right)
 	* feature graph window (bottom right)
-	
+	<br/><br/>
+
 	In this mode all the widgets are fixed in space and all the relevant information is visible at all times.
 
 * `Test`: a layout that allow for more user configuration consisting of
@@ -36,6 +37,7 @@ The mode refers to two different layout options of the GUI:
 	* real world view (left)
 	* SLAM results plot (right, currently in the front)
 	* feature graph window (right, in the back)
+	<br/><br/>
 
 	This mode was designed specifically for the considered case, that is real world and simulated environment are basically the same.
 	Here the two plots on the right are (un)dockable and can be resized and reorganized to some degree.

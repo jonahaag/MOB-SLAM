@@ -12,3 +12,4 @@ nav:
 repo_url: https://github.tik.uni-stuttgart.de/JHaag/Model_based_SLAM
 edit_uri: edit/main/docs
 site_author: Jonathan Haag
+use_directory_urls : false
