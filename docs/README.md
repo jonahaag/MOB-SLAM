@@ -46,7 +46,7 @@ It is split up into:
 	* creates a [NetworkX](https://networkx.org) graph with the features as nodes and user-setting-based edges
 	* displays that graph on top of the image
 
-Please refer to the [homepage]() for more information on contents.
+Please refer to the [homepage](https://pages.github.tik.uni-stuttgart.de/JHaag/Model_based_SLAM/) for more information on contents.
 There is also a small introduction available to get going.
 
 ## Prerequisites
