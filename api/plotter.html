@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="Jonathan Haag">
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Plotting with pyqtgraph - Model-based SLAM</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  <link href="../assets/_mkdocstrings.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Plotting with pyqtgraph";
+    var mkdocs_page_input_path = "api/plotter.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../index.html" class="icon icon-home"> Model-based SLAM</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a>
+    <ul>
+    <li class="toctree-l2"><a class="reference internal" href="../index.html#repository-overview">Repository overview</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="../index.html#prerequisites">Prerequisites</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="../index.html#open-issues">Open issues</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">User Guide</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../get_going.html">Get going</a>
+    <ul>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Components</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../gui.html">GUI</a>
+    <ul>
+    <li class="toctree-l2"><a class="reference internal" href="../gui.html#basic-gui-layout">Basic GUI layout</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="../gui.html#option-bar">Option Bar</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="../gui.html#settings-dialog">Settings dialog</a>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../slam.html">SLAM</a>
+    <ul>
+    <li class="toctree-l2"><a class="reference internal" href="../slam.html#slam-basics">SLAM basics</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="../slam.html#orb-slam-extension-for-deformable-enviroments">ORB-SLAM extension for deformable enviroments</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="../slam.html#matlab-implementation">MATLAB implementation</a>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../sofa_viewer.html">Sofa Viewer</a>
+    <ul>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../feature_graph.html">Feature Graph</a>
+    <ul>
+    <li class="toctree-l2"><a class="reference internal" href="../feature_graph.html#feature-matching-basics">Feature matching basics</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="../feature_graph.html#problems-in-deformable-enviroments">Problems in deformable enviroments</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="../feature_graph.html#concept-of-graph-based-feature-matching">Concept of graph-based feature matching</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="../feature_graph.html#contents">Contents</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API Documentation</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="orb.html">EngineORB</a>
+    <ul>
+    <li class="toctree-l2"><a class="reference internal" href="orb.html#class-engineorb">Class EngineORB</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="orb.html#gui.orb.EngineORB">gui.orb.EngineORB</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="orb.html#gui.orb.EngineORB.__init__">__init__()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="orb.html#gui.orb.EngineORB.add_pos_to_gt">add_pos_to_gt()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="orb.html#gui.orb.EngineORB.enforce_trajectory">enforce_trajectory()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="orb.html#gui.orb.EngineORB.initialize_slam">initialize_slam()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="orb.html#gui.orb.EngineORB.keyPressEvent">keyPressEvent()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="orb.html#gui.orb.EngineORB.main_slam">main_slam()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="orb.html#gui.orb.EngineORB.read_camera_position">read_camera_position()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="orb.html#gui.orb.EngineORB.set_image_source">set_image_source()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="orb.html#gui.orb.EngineORB.set_main_window">set_main_window()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="orb.html#gui.orb.EngineORB.set_sim">set_sim()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="orb.html#gui.orb.EngineORB.set_viewer">set_viewer()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="orb.html#gui.orb.EngineORB.start_sim">start_sim()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="orb.html#gui.orb.EngineORB.start_slam">start_slam()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="orb.html#gui.orb.EngineORB.stop_sim">stop_sim()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="orb.html#gui.orb.EngineORB.stop_slam">stop_slam()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="orb.html#gui.orb.EngineORB.update_sim_camera">update_sim_camera()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="orb.html#gui.orb.EngineORB.update_sim_step">update_sim_step()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="orb.html#gui.orb.EngineORB.update_slam">update_slam()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="orb.html#gui.orb.EngineORB.viewer_info">viewer_info()</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="orb.html#gui.orb.EngineORB.write_camera_position">write_camera_position()</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="orb.html#helper-function">Helper function</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="orb.html#gui.orb.compute_trajectory">gui.orb.compute_trajectory</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="plotter.html">Plotting with pyqtgraph</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#gui.plotter">gui.plotter</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#gui.plotter.plot_ground_truth">plot_ground_truth()</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#gui.plotter.plot_slam_results">plot_slam_results()</a>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="feature_graph.html">Feature Graph</a>
+    <ul>
+    <li class="toctree-l2"><a class="reference internal" href="feature_graph.html#feature_graph.network">feature_graph.network</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="feature_graph.html#feature_graph.network.draw_img_and_graph">draw_img_and_graph()</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="feature_graph.html#feature_graph.network.extract_feature_graph">extract_feature_graph()</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">Model-based SLAM</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>API Documentation &raquo;</li>
+        
+      
+    
+    <li>Plotting with pyqtgraph</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.tik.uni-stuttgart.de/JHaag/Model_based_SLAM/edit/main/docs/api/plotter.md"
+          class="icon icon-github"> Edit on Github</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="documentation-of-functions-used-for-the-plotting">Documentation of functions used for the plotting</h1>
+
+
+  <div class="doc doc-object doc-module">
+
+<a id="gui.plotter"></a>
+    <div class="doc doc-contents first">
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h3 class="doc doc-heading" id="gui.plotter.plot_ground_truth">
+<code class="highlight language-python"><span class="n">plot_ground_truth</span><span class="p">(</span><span class="n">ground_truth_plot</span><span class="p">,</span> <span class="n">camera_positions</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Function to plot the ground truth after stopping the SLAM</p>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li><p><strong>ground_truth_plot</strong> (<code>GLLinePlotItem</code>) – A pyqtgraph.opengl item to line plot the actual camera positions</p></li>
+            <li><p><strong>camera_positions</strong> (<code>np.array</code>) – Set of actual camera positions</p></li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>gui/plotter.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">plot_ground_truth</span><span class="p">(</span><span class="n">ground_truth_plot</span><span class="p">,</span> <span class="n">camera_positions</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Function to plot the ground truth after stopping the SLAM</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        ground_truth_plot (GLLinePlotItem): A pyqtgraph.opengl item to line plot the actual camera positions</span>
+<span class="sd">        camera_positions (np.array): Set of actual camera positions</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ground_truth_plot</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span>
+        <span class="n">pos</span><span class="o">=</span><span class="n">camera_positions</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#cb9b1d&quot;</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
+        <span class="n">antialias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;line_strip&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h3 class="doc doc-heading" id="gui.plotter.plot_slam_results">
+<code class="highlight language-python"><span class="n">plot_slam_results</span><span class="p">(</span><span class="n">worldpoint_plot</span><span class="p">,</span> <span class="n">cam_pos_plot</span><span class="p">,</span> <span class="n">worldpoints</span><span class="p">,</span> <span class="n">camera_positions</span><span class="p">,</span> <span class="n">slam_results_plot</span><span class="p">,</span> <span class="n">follow_camera</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Function to plot the SLAM results (camera tracking and environment mapping) using pyqtgraph</p>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li><p><strong>worldpoint_plot</strong> (<code>GLScatterPlotItem</code>) – A pyqtgraph.opengl item to scatter plot the detected world points</p></li>
+            <li><p><strong>cam_pos_plot</strong> (<code>GLLinePlotItem</code>) – A pyqtgraph.opengl item to line plot the estimated camera positions</p></li>
+            <li><p><strong>worldpoints</strong> (<code>np.array</code>) – Set of estimated world points</p></li>
+            <li><p><strong>camera_positions</strong> (<code>np.array</code>) – Set of estimated camera positions</p></li>
+            <li><p><strong>slam_results_plot</strong> (<code>GLViewWidget</code>) – Parent widget that contains the plot items</p></li>
+            <li><p><strong>follow_camera</strong> (<code>bool</code>) – Indicating whether the view of the plot should update automatically to reflect the estimated camera position, not working properly</p></li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>gui/plotter.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">plot_slam_results</span><span class="p">(</span>
+    <span class="n">worldpoint_plot</span><span class="p">,</span>
+    <span class="n">cam_pos_plot</span><span class="p">,</span>
+    <span class="n">worldpoints</span><span class="p">,</span>
+    <span class="n">camera_positions</span><span class="p">,</span>
+    <span class="n">slam_results_plot</span><span class="p">,</span>
+    <span class="n">follow_camera</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Function to plot the SLAM results (camera tracking and environment mapping) using pyqtgraph</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        worldpoint_plot (GLScatterPlotItem): A pyqtgraph.opengl item to scatter plot the detected world points</span>
+<span class="sd">        cam_pos_plot (GLLinePlotItem): A pyqtgraph.opengl item to line plot the estimated camera positions</span>
+<span class="sd">        worldpoints (np.array): Set of estimated world points</span>
+<span class="sd">        camera_positions (np.array): Set of estimated camera positions</span>
+<span class="sd">        slam_results_plot (GLViewWidget): Parent widget that contains the plot items</span>
+<span class="sd">        follow_camera (bool): Indicating whether the view of the plot should update automatically to reflect the estimated camera position, not working properly</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">worldpoint_plot</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span>
+        <span class="n">pos</span><span class="o">=</span><span class="n">worldpoints</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">pxMode</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="n">cam_pos_plot</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span>
+        <span class="n">pos</span><span class="o">=</span><span class="n">camera_positions</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#66cdaa&quot;</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
+        <span class="n">antialias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;line_strip&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">follow_camera</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">camera_positions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">camera_positions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">camera_positions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">z</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># slam_results_plot.setCameraPosition(pos=pg.Vector(camera_positions[-1][0],camera_positions[-1][1],camera_positions[-1][2]))</span>
+        <span class="n">azimuth</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan</span><span class="p">(</span><span class="n">x</span> <span class="o">/</span> <span class="n">y</span><span class="p">)</span> <span class="o">*</span> <span class="mi">180</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span>
+        <span class="n">elevation</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan</span><span class="p">(</span><span class="n">y</span> <span class="o">/</span> <span class="n">z</span><span class="p">)</span> <span class="o">*</span> <span class="mi">180</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span>
+        <span class="n">slam_results_plot</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s2">&quot;distance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span>  <span class="c1">## distance of camera from center</span>
+        <span class="n">slam_results_plot</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s2">&quot;fov&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">60</span>  <span class="c1">## horizontal field of view in degrees</span>
+        <span class="n">slam_results_plot</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span>
+            <span class="s2">&quot;elevation&quot;</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="n">elevation</span>  <span class="c1">## camera&#39;s angle of elevation in degrees</span>
+        <span class="n">slam_results_plot</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span>
+            <span class="s2">&quot;azimuth&quot;</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="n">azimuth</span>  <span class="c1">## camera&#39;s azimuthal angle in degrees</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">slam_results_plot</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s2">&quot;distance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">3.5</span>  <span class="c1">## distance of camera from center</span>
+        <span class="n">slam_results_plot</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s2">&quot;fov&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">60</span>  <span class="c1">## horizontal field of view in degrees</span>
+        <span class="n">slam_results_plot</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span>
+            <span class="s2">&quot;elevation&quot;</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">65</span>  <span class="c1">## camera&#39;s angle of elevation in degrees</span>
+        <span class="n">slam_results_plot</span><span class="o">.</span><span class="n">opts</span><span class="p">[</span><span class="s2">&quot;azimuth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>  <span class="c1">## camera&#39;s azimuthal angle in degrees</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+              
+            </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="orb.html" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="feature_graph.html" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
