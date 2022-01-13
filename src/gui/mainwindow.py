@@ -124,7 +124,7 @@ class CustomDialog(QDialog):
         self.max_distance = max_distance
         # change the number of simulation steps to be skipped before new screenshot is recorded for the feature graph
         self.skip_images_network_label = QLabel(
-            "Number of simulation steps to be skipped before new SLAM step:"
+            "Number of simulation steps to be skipped before new feature graph update:"
         )
         self.skip_images_network_label_line_edit = QLineEdit(str(skip_images_network))
         self.skip_images_network_label_line_edit.setAlignment(Qt.AlignRight)
@@ -137,8 +137,8 @@ class CustomDialog(QDialog):
         self.networkx_tab_layout.addWidget(self.n_of_keypoints_line_edit, 0, 1)
         self.networkx_tab_layout.addWidget(self.max_distance_label, 1, 0)
         self.networkx_tab_layout.addWidget(self.max_distance_label_line_edit, 1, 1)
-        self.general_tab_layout.addWidget(self.skip_images_network_label, 2, 0, 1, 1)
-        self.general_tab_layout.addWidget(
+        self.networkx_tab_layout.addWidget(self.skip_images_network_label, 2, 0, 1, 1)
+        self.networkx_tab_layout.addWidget(
             self.skip_images_network_label_line_edit, 2, 1
         )
         self.networkx_tab_layout.setColumnStretch(0, 4)
@@ -222,7 +222,7 @@ class CustomDialog(QDialog):
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, mode, slam):
+    def __init__(self, mode, slam, navigation, trajectory_path):
         super(MainWindow, self).__init__()
 
         # class to hold the scene, simulation representing the real world
@@ -428,7 +428,8 @@ class MainWindow(QMainWindow):
             mat_dir=mat_dir,
             skip_images_init=4,
             skip_images_main=10,
-            mode="keypoint_navigation",
+            mode=navigation,
+            trajectory_path=trajectory_path
         )
         self.mat_engine.set_image_source(self.real_world)
         self.mat_engine.set_viewer(self.view_real)

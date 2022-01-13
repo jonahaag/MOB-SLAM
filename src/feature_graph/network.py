@@ -16,7 +16,7 @@ def extract_feature_graph(img_rgb, n_of_keypoints, max_distance):
         max_distance (float): Maximum distance at which two keypoints still get connected via an edge in the graph
 
     Returns:
-        detected keypoints, pixel position of detected keypoints, decriptors of the detected features, and NetworkX graph with keypoints as vertices
+        list: detected keypoints, pixel position of detected keypoints, decriptors of the detected features, and NetworkX graph with keypoints as vertices
     """
     # convert rgb image to greyscale
     img = np.dot(img_rgb[..., :3], [0.299, 0.587, 0.114])

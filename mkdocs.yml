@@ -9,8 +9,8 @@ nav:
         - 'Sofa Viewer': 'sofa_viewer.md'
         - 'Feature Graph': 'feature_graph.md'
     - 'API Documentation':
-        - 'GUI': 'api/gui.md'
         - 'EngineORB': 'api/orb.md'
+        - 'Plotting with pyqtgraph': 'api/plotter.md'
         - 'Feature Graph': 'api/feature_graph.md'
 repo_url: https://github.tik.uni-stuttgart.de/JHaag/Model_based_SLAM
 edit_uri: edit/main/docs

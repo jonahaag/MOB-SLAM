@@ -23,7 +23,16 @@ The options bar consists of the following elements:
 
 ## Settings dialog
 
-Following values can be set by the user:
+The following values can be set by the user:
 
-* abc
-
+* Tab `General/SLAM`:
+    * Checkbox to update SLAM view automatically based on current estimated camera positon (not working)
+    * Number of simulation steps to run before updating the SLAM again
+* Tab `Sofa`:
+    * Material properties of the simulated object: young's modulus and poisson ratio
+    * flags indicating which parts of the SOFA model to display
+* Tab `NetworkX`:
+    * Number of ORB features for the graph extraction
+    * Maximum distance at which to features are still connected via an edge in the graph
+    * Number of simulation steps to run before updating the feature graph again
+    * Remark: Please be aware that a large graph (i.e. many features and/or large maximum distance) may affect performance

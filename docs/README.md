@@ -50,15 +50,16 @@ Please refer to the [homepage](https://pages.github.tik.uni-stuttgart.de/JHaag/M
 There is also a small introduction available to get going.
 
 ## Prerequisites
+Versions used for testing in brackets.
 
-1. Python, implemented in 3.7, not tested in other versions
-1. [MATLAB](https://www.mathworks.com/products/matlab.html), implemented in 2020b, not tested with older versions
-1. [Sofa](https://www.sofa-framework.org) with Python3 bindings
-1. [qtpy](https://pypi.org/project/QtPy/), [PyQt5](https://pypi.org/project/PyQt5/)
-1. [pyqtgraph](https://pyqtgraph.readthedocs.io/en/latest/)
-1. [NetworkX](https://networkx.org)
-1. [cv2](https://pypi.org/project/opencv-python/)
-1. [qdarkstyle](https://qdarkstylesheet.readthedocs.io/en/latest/)
+1. Python (3.7)
+1. [MATLAB](https://www.mathworks.com/products/matlab.html) (2020b)
+1. [Sofa](https://www.sofa-framework.org) with Python3 bindings (v20.12)
+1. [qtpy](https://pypi.org/project/QtPy/) (1.9.0), [PyQt5](https://pypi.org/project/PyQt5/) (5.15.4)
+1. [pyqtgraph](https://pyqtgraph.readthedocs.io/en/latest/) (0.12.1)
+1. [NetworkX](https://networkx.org) (2.5.1)
+1. [cv2](https://pypi.org/project/opencv-python/) (4.5.2)
+1. [qdarkstyle](https://qdarkstylesheet.readthedocs.io/en/latest/) (3.0.2)
 
 ## Open issues
 

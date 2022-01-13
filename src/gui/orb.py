@@ -64,7 +64,7 @@ class EngineORB:
         mode="fromfile",
         trajectory_path="sofaviewer/trajectories/navigation/",
     ):
-        """Initalization function for EngineORB
+        """Constructor of EngineORB
 
         Args:
             slam (str): Switch between ORB-SLAM ("orb") and Model-based SLAM ("mob")
@@ -101,7 +101,7 @@ class EngineORB:
         self.ground_truth_orientations = np.zeros(shape=(100, 4))
         self.mode = mode
         self.trajectory_path = trajectory_path
-        self.navigation_path = "sofaviewer/trajectories/navigation/"
+        self.navigation_path = "trajectories/navigation/"
         if mode == "fromfile":
             print("Reading camera trajectory")
             with open(
@@ -116,7 +116,6 @@ class EngineORB:
                 reader = csv.reader(f, delimiter=" ", quoting=csv.QUOTE_NONNUMERIC)
                 for row in reader:
                     self.orientations.append(list(row))
-            # TODO funktioniert auch ohne np.array???
             self.positions = np.array(self.positions)
             self.orientations = np.array(self.orientations)
             self.n_positions = self.positions.shape[0]
@@ -138,7 +137,7 @@ class EngineORB:
         elif mode == "keypoint_navigation":
             print("Reading camera trajectory keypoints and -times")
             keypoints = []
-            with open(os.path.join(self.trajectory_path, "keypoints1b.txt"), "r") as f:
+            with open(self.trajectory_path, "r") as f:
                 reader = csv.reader(f, delimiter=" ", quoting=csv.QUOTE_NONNUMERIC)
                 for row in reader:
                     keypoints.append(list(row))
@@ -374,7 +373,7 @@ class EngineORB:
         if self.mode == "tofile":
             if self.trajectory_path == self.navigation_path:
                 with open(
-                    os.path.join(self.trajectory_path, "keypoints3.txt"), "w"
+                    os.path.join(self.trajectory_path, "keypoints_new.txt"), "w"
                 ) as f:
                     wr = csv.writer(f, delimiter=" ", quoting=csv.QUOTE_NONNUMERIC)
                     wr.writerows(self.keypoints)
