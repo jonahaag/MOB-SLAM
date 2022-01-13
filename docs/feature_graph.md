@@ -1,5 +1,3 @@
-## Creating a feature graph
-
 ### Feature matching basics
 
 A big challenge of operating in deformable environments is the compromising of feature matching, which is a important part of the standard SLAM processing.

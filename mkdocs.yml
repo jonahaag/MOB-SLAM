@@ -1,0 +1,14 @@
+site_name: Model-based SLAM
+nav: 
+    - Home: 'index.md'
+    - 'User Guide':
+        - 'Get going': 'get_going.md'
+    - 'Components':
+        - 'GUI': 'gui.md'
+        - 'SLAM': 'slam.md'
+        - 'Sofa Viewer': 'sofa_viewer.md'
+        - 'Feature Graph': 'feature_graph.md'
+
+repo_url: https://github.tik.uni-stuttgart.de/JHaag/Model_based_SLAM
+edit_uri: edit/main/docs
+site_author: Jonathan Haag

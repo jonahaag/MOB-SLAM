@@ -1,5 +1,3 @@
-## MATLAB implementation of Model-based SLAM
-
 ### SLAM basics
 
 Simultaneous Localization and Mapping (SLAM) is a term describing a more or less broad class of algorithms that aim at reconstructing the surrounding (mapping) and providing precise position information (localization) of a mobile agent simultaneously using the agent's sensory input data.
@@ -15,7 +13,7 @@ In this project deformable environments are considered, which can cause the esti
 To act upon these emerging diffuculties, this proof-of-concept tries to use an existing environment model to predict the ongoing deformation.
 The predictions are then used to update the results of the standard algorithm to still produce satisfactory results.
 
-### Contents
+### MATLAB implementation
 
 The [slam folder](../src/slam) contains a MATLAB implementation of ORB-SLAM that is available via [MathWorks](https://de.mathworks.com/help/vision/ug/monocular-visual-simultaneous-localization-and-mapping.html).
 While the predicted deformation is computed in Python using SOFA, incorporating that information into the ongoing SLAM process is done in MATLAB.
