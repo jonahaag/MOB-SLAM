@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="Jonathan Haag">
+  
+  <link rel="shortcut icon" href="img/favicon.ico">
+  <title>SLAM - Model-based SLAM</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "SLAM";
+    var mkdocs_page_input_path = "slam.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="js/jquery-2.1.1.min.js" defer></script>
+  <script src="js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="icon icon-home"> Model-based SLAM</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="index.html">Home</a>
+    <ul>
+    <li class="toctree-l2"><a class="reference internal" href="index.html#repository-overview">Repository overview</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="index.html#prerequisites">Prerequisites</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="index.html#open-issues">Open issues</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">User Guide</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="get_going.html">Get going</a>
+    <ul>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Components</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="gui.html">GUI</a>
+    <ul>
+    <li class="toctree-l2"><a class="reference internal" href="gui.html#basic-gui-layout">Basic GUI layout</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="gui.html#option-bar">Option Bar</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="gui.html#settings-dialog">Settings dialog</a>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="slam.html">SLAM</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#slam-basics">SLAM basics</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#orb-slam-extension-for-deformable-enviroments">ORB-SLAM extension for deformable enviroments</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#matlab-implementation">MATLAB implementation</a>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="sofa_viewer.html">Sofa Viewer</a>
+    <ul>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="feature_graph.html">Feature Graph</a>
+    <ul>
+    <li class="toctree-l2"><a class="reference internal" href="feature_graph.html#feature-matching-basics">Feature matching basics</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="feature_graph.html#problems-in-deformable-enviroments">Problems in deformable enviroments</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="feature_graph.html#concept-of-graph-based-feature-matching">Concept of graph-based feature matching</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="feature_graph.html#contents">Contents</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Model-based SLAM</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Components &raquo;</li>
+        
+      
+    
+    <li>SLAM</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.tik.uni-stuttgart.de/JHaag/Model_based_SLAM/edit/main/docs/slam.md"
+          class="icon icon-github"> Edit on Github</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="slam">SLAM</h1>
+<h2 id="slam-basics">SLAM basics</h2>
+<p>Simultaneous Localization and Mapping (SLAM) is a term describing a more or less broad class of algorithms that aim at reconstructing the surrounding (mapping) and providing precise position information (localization) of a mobile agent simultaneously using the agent's sensory input data.
+This project considers the probably most-studied case of a monocular camera, i.e. a single camera image is supplied to the algorithm continuously.
+However, in the literature many different sensor configurations can be found.</p>
+<p>For the classic monocular case in a rigid enviroment, many different solution schemes have been developed and studied extensively.
+One of the most well-known of these is ORB-SLAM, an algorithm that relies on ORB feature detection and has been proven to deliver very good results using common public datasets and real-world data.</p>
+<h2 id="orb-slam-extension-for-deformable-enviroments">ORB-SLAM extension for deformable enviroments</h2>
+<p>In this project deformable environments are considered, which can cause the estimated and actual camera position to diverge and also leads to inaccurate mapping of the environment when using the "standard" (unmodified) ORB-SLAM.
+To act upon these emerging diffuculties, this proof-of-concept tries to use an existing environment model to predict the ongoing deformation.
+The predictions are then used to update the results of the standard algorithm to still produce satisfactory results.</p>
+<h2 id="matlab-implementation">MATLAB implementation</h2>
+<p>The <code>src/slam</code> folder contains a MATLAB implementation of ORB-SLAM that is available via <a href="https://de.mathworks.com/help/vision/ug/monocular-visual-simultaneous-localization-and-mapping.html">MathWorks</a>.
+While the predicted deformation is computed in Python using SOFA, incorporating that information into the ongoing SLAM process is done in MATLAB.
+The main contributions are located in the <a href="../src/slam/projectionAndPrediction">projectionAndPrediction folder</a>.
+The basic concept of the model-based approach contains methods and scripts to perform the following steps:</p>
+<ul>
+<li>projecting new map points on the surface of the environment model<ul>
+<li><code>projectMapPoints.m</code></li>
+<li><code>cameraViewProjection.m</code></li>
+</ul>
+</li>
+<li>updating the position of points that were projected at previous iterations based on new predictions of the deformation (forward prediction)<ul>
+<li><code>forwardPrediction.m</code></li>
+</ul>
+</li>
+<li>updating the correspondend 2D position of the feature in the image<ul>
+<li><code>updateFeaturePosition.m</code></li>
+</ul>
+</li>
+<li>keeping track of projected points, removing points that are no longer considered<ul>
+<li><code>addProjectedPoints.m</code></li>
+<li><code>removeProjectedPoints.m</code></li>
+<li><code>removeUnprojectedPoints.m</code></li>
+</ul>
+</li>
+</ul>
+<p>The remaining functions are used as helper functions or are deprecated but kept for testing purposes.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="gui.html" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="sofa_viewer.html" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="None">
+  <meta name="author" content="Jonathan Haag">
+  
+  <link rel="shortcut icon" href="img/favicon.ico">
+  <title>Model-based SLAM</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Home";
+    var mkdocs_page_input_path = "README.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="js/jquery-2.1.1.min.js" defer></script>
+  <script src="js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="icon icon-home"> Model-based SLAM</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="index.html">Home</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#repository-overview">Repository overview</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#open-issues">Open issues</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">User Guide</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="get_going.html">Get going</a>
+    <ul>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Components</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="gui.html">GUI</a>
+    <ul>
+    <li class="toctree-l2"><a class="reference internal" href="gui.html#basic-gui-layout">Basic GUI layout</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="gui.html#option-bar">Option Bar</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="gui.html#settings-dialog">Settings dialog</a>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="slam.html">SLAM</a>
+    <ul>
+    <li class="toctree-l2"><a class="reference internal" href="slam.html#slam-basics">SLAM basics</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="slam.html#orb-slam-extension-for-deformable-enviroments">ORB-SLAM extension for deformable enviroments</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="slam.html#matlab-implementation">MATLAB implementation</a>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="sofa_viewer.html">Sofa Viewer</a>
+    <ul>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="feature_graph.html">Feature Graph</a>
+    <ul>
+    <li class="toctree-l2"><a class="reference internal" href="feature_graph.html#feature-matching-basics">Feature matching basics</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="feature_graph.html#problems-in-deformable-enviroments">Problems in deformable enviroments</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="feature_graph.html#concept-of-graph-based-feature-matching">Concept of graph-based feature matching</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="feature_graph.html#contents">Contents</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Model-based SLAM</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Home</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.tik.uni-stuttgart.de/JHaag/Model_based_SLAM/edit/main/docs/README.md"
+          class="icon icon-github"> Edit on Github</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="model-based-slam">Model-based SLAM</h1>
+<p>MobSLAM is a Simultaneous Localization and Mapping system for deformable environments.
+This repository contains a graphical user interface that enables </p>
+<ul>
+<li>the display of a <a href="https://www.sofa-framework.org">SOFA simulation</a></li>
+<li>different options to record and select different paths as well as a keyboard controller for the simulation camera</li>
+<li>different options to deform the simulated object</li>
+<li>use of a Simultaneous Localization and Mapping (SLAM) algorithm to <ol>
+<li>track the camera movement within the simulation </li>
+<li>generate a map of the scene</li>
+<li>incorporate deformation information based on a parallel simulation</li>
+</ol>
+</li>
+</ul>
+<p><img alt="" src="images/main_gui2.png" /></p>
+<p>It is designed to be modular and easily extensible and aims at providing a reliable and replicable code base for future work on this topic.</p>
+<p>The model-based approach enables the SLAM algorithm to produce good results even in the presence of deformations e.g. caused by external forces or changes in volume.
+The aim of this work is to provide a more reliable geometric representation of deformable structures based on a monocular camera by directly incorporating information about the deformation into the mapping.</p>
+<p>The basic idea is to run a parallel FEM simulation predicting the deformation based on measurements and then use the simulated surface information, i.e. vertex positions, to continuously update the SLAM results.
+At this stage there is no distinction between the "real world" and the simulation which basically corresponds to perfect predictions of the deformation.
+This is obviously almost impossible to achieve in real life which is why the interface is designed to easily separate between the two views - more information on this can be found below.
+This repository was created as part of the research area B1 concerning <a href="https://www.grk2543.uni-stuttgart.de/en/research/b-modeling-and-classification/b1-modeling/">Intraoperative Navigation of Multimodal sensors</a> of the <a href="https://www.grk2543.uni-stuttgart.de/en/">RTG 2543: Intraoperative Multisensory Tissue Differentiation in Oncology</a> at the <a href="https://www.isys.uni-stuttgart.de/en/">Institute for System Dynamics (ISYS)</a>, University of Stuttgart, Germany.</p>
+<p>It builds on top of <a href="https://github.com/psomers3/QSofaGLViewTools">QSofaGLViewTools</a> and <a href="https://www.mathworks.com/help/vision/ug/monocular-visual-simultaneous-localization-and-mapping.html">MATLAB Monocular Visual Simultaneous Localization and Mapping</a>.</p>
+<h2 id="repository-overview">Repository overview</h2>
+<p>The source code as well as all relevant information can be found in the <code>src</code> folder.
+It is split up into:</p>
+<ul>
+<li>the main script <code>main.py</code> to run the GUI</li>
+<li>the subfolder <code>gui</code> containing<ul>
+<li><code>mainwindow.py</code>: contains all the GUI elements (Widgets, Layouts, interactive elements,...) as well as the SOFA viewer and an instance of <code>EngineORB</code></li>
+<li><code>orb.py</code>: contains the class that is responsible for transformation and exchange of data between the SLAM (MATLAB) and the SOFA simulation (Python)</li>
+<li><code>plotter.py</code>: contains functions to plot the results using <a href="https://pyqtgraph.readthedocs.io/en/latest/">pyqtgraph</a></li>
+</ul>
+</li>
+<li>the subfolder <code>mesh</code> containing some basic mesh files and texture images that were used for testing</li>
+<li>the subfolder <code>slam</code> containing<ul>
+<li>the MATLAB implementation of ORB-SLAM</li>
+<li>the added functions and scripts for projection and forward prediction based on the simulated deformation, i.e. the core part of the model-based SLAM</li>
+</ul>
+</li>
+<li>the subfolder <code>sofaviewer</code> containing a past version of <a href="https://github.com/psomers3/QSofaGLViewTools">psomers3/QSofaGLViewTools</a>:
+    &gt; A small PyQt widget library for viewing SOFA simulation cameras and controlling them.</li>
+<li>the subfolder <code>feature_graph</code> which <ul>
+<li>uses <a href="https://pypi.org/project/opencv-python/">opencv-python</a> to extract ORB features of the current image</li>
+<li>creates a <a href="https://networkx.org">NetworkX</a> graph with the features as nodes and user-setting-based edges</li>
+<li>displays that graph on top of the image</li>
+</ul>
+</li>
+</ul>
+<p>Please refer to the <a href="">homepage</a> for more information on contents.
+There is also a small introduction available to get going.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<ol>
+<li>Python, implemented in 3.7, not tested in other versions</li>
+<li><a href="https://www.mathworks.com/products/matlab.html">MATLAB</a>, implemented in 2020b, not tested with older versions</li>
+<li><a href="https://www.sofa-framework.org">Sofa</a> with Python3 bindings</li>
+<li><a href="https://pypi.org/project/QtPy/">qtpy</a>, <a href="https://pypi.org/project/PyQt5/">PyQt5</a></li>
+<li><a href="https://pyqtgraph.readthedocs.io/en/latest/">pyqtgraph</a></li>
+<li><a href="https://networkx.org">NetworkX</a></li>
+<li><a href="https://pypi.org/project/opencv-python/">cv2</a></li>
+<li><a href="https://qdarkstylesheet.readthedocs.io/en/latest/">qdarkstyle</a></li>
+</ol>
+<h2 id="open-issues">Open issues</h2>
+<p>Please see the issues section of the GitHub repository for existing issues and bugs that have not be fully resolved yet.
+A major bottleneck of the RSE infrastructure is the lack of proper testing, poor error handling, especially between MATLAB and Python, and missing automation regarding CI/GitHub workflows.
+Furthermore, checking data types of user inputs, e.g. when using the settings dialog, is an obvious area for potential improvement.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+      <span><a href="get_going.html" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 1.2.3
+Build Date UTC : 2022-01-13 12:05:21.574301+00:00
+-->

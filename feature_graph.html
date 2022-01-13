@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="Jonathan Haag">
+  
+  <link rel="shortcut icon" href="img/favicon.ico">
+  <title>Feature Graph - Model-based SLAM</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Feature Graph";
+    var mkdocs_page_input_path = "feature_graph.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="js/jquery-2.1.1.min.js" defer></script>
+  <script src="js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="icon icon-home"> Model-based SLAM</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="index.html">Home</a>
+    <ul>
+    <li class="toctree-l2"><a class="reference internal" href="index.html#repository-overview">Repository overview</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="index.html#prerequisites">Prerequisites</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="index.html#open-issues">Open issues</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">User Guide</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="get_going.html">Get going</a>
+    <ul>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Components</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="gui.html">GUI</a>
+    <ul>
+    <li class="toctree-l2"><a class="reference internal" href="gui.html#basic-gui-layout">Basic GUI layout</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="gui.html#option-bar">Option Bar</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="gui.html#settings-dialog">Settings dialog</a>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="slam.html">SLAM</a>
+    <ul>
+    <li class="toctree-l2"><a class="reference internal" href="slam.html#slam-basics">SLAM basics</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="slam.html#orb-slam-extension-for-deformable-enviroments">ORB-SLAM extension for deformable enviroments</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="slam.html#matlab-implementation">MATLAB implementation</a>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="sofa_viewer.html">Sofa Viewer</a>
+    <ul>
+    </ul>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="feature_graph.html">Feature Graph</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#feature-matching-basics">Feature matching basics</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#problems-in-deformable-enviroments">Problems in deformable enviroments</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#concept-of-graph-based-feature-matching">Concept of graph-based feature matching</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#contents">Contents</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Model-based SLAM</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Components &raquo;</li>
+        
+      
+    
+    <li>Feature Graph</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.tik.uni-stuttgart.de/JHaag/Model_based_SLAM/edit/main/docs/feature_graph.md"
+          class="icon icon-github"> Edit on Github</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="feature-graph">Feature Graph</h1>
+<h2 id="feature-matching-basics">Feature matching basics</h2>
+<p>A big challenge of operating in deformable environments is the compromising of feature matching, which is a important part of the standard SLAM processing.
+Feature matching refers to the act of finding the same features across a series of images such that in later steps the scene can be reconstructed based on the overlap between multiple images using triangulation.
+Typically, performance as well as precision of the entire algorithm relies heavily on the accuracy of the matching.</p>
+<h2 id="problems-in-deformable-enviroments">Problems in deformable enviroments</h2>
+<p>In the presence of deformations, finding suitable matches betwenn the set of detected features usually is hard due to two main reasons:
+1. Changes in the relative position of the features. This might not be too big of an issue for the matching itself, but definitely can lead to errors when trying to find the proper alignment of the images based on those matches.
+1. Visual appearance of the features might change between recordings.</p>
+<h2 id="concept-of-graph-based-feature-matching">Concept of graph-based feature matching</h2>
+<p>One way to deal with this is to use a graph-based approaches.
+The main idea here is to create a graph using the features as vertices and defining the edges e.g. based on some visual markers.
+This allows for the additional definition of constraints regardings the edge and vertex positions and connections and can therefore increse robustness and performance of the feature matching in challenging scenarios.</p>
+<h2 id="contents">Contents</h2>
+<p>However, implementing this completely was out of scope for this project, which is why only the basics of creating a feature graph are considered here.
+For this, ORB features are detected in the current image and used as vertices for the graph.
+Then, each vertex is connected to all other vertices that lie within a certain distance of that vertex and the final graph is drawn on top of the image and displayed in the GUI.
+User settings regarding the maximum distance for two vertices to be connected, the maximum number of features, and the frequency of the graph extraction exist.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="sofa_viewer.html" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
