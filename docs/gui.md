@@ -1,3 +1,5 @@
+# GUI
+
 ## Basic GUI layout
 
 There exist two basic layout modes: `Main` (left) and `Test` (right) that, for the most part, consist of the same elements.

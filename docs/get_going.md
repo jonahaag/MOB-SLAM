@@ -1,4 +1,4 @@
-## Get going
+# Get going
 
 To open the GUI, step into the source folder and simply run `main.py`, e.g. via
 

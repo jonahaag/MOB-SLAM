@@ -1,3 +1,5 @@
+# SLAM
+
 ## SLAM basics
 
 Simultaneous Localization and Mapping (SLAM) is a term describing a more or less broad class of algorithms that aim at reconstructing the surrounding (mapping) and providing precise position information (localization) of a mobile agent simultaneously using the agent's sensory input data.

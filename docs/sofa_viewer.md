@@ -1,4 +1,4 @@
-## Sofa Viewer
+# Sofa Viewer
 
 Based on a past version of [psomers3/QSofaGLViewTools](https://github.com/psomers3/QSofaGLViewTools) this is a small PyQt widget library for viewing SOFA simulation cameras and controlling them.
 

@@ -15,4 +15,5 @@ site_author: Jonathan Haag
 use_directory_urls : false
 theme:
    name: readthedocs
+   collapse_navigation : false
    prev_next_buttons_location: none
