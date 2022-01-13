@@ -46,7 +46,7 @@ It is split up into:
 	* creates a [NetworkX](https://networkx.org) graph with the features as nodes and user-setting-based edges
 	* displays that graph on top of the image
 
-Please refer to the [docs](docs) or the [homepage]() for more information on contents.
+Please refer to the [homepage]() for more information on contents.
 There is also a small introduction available to get going.
 
 ## Prerequisites
@@ -64,3 +64,4 @@ There is also a small introduction available to get going.
 
 Please see the issues section of the GitHub repository for existing issues and bugs that have not be fully resolved yet.
 A major bottleneck of the RSE infrastructure is the lack of proper testing, poor error handling, especially between MATLAB and Python, and missing automation regarding CI/GitHub workflows.
+Furthermore, checking data types of user inputs, e.g. when using the settings dialog, is an obvious area for potential improvement.

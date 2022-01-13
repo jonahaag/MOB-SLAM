@@ -1,6 +1,6 @@
 site_name: Model-based SLAM
 nav: 
-    - Home: 'index.md'
+    - Home: 'README.md'
     - 'User Guide':
         - 'Get going': 'get_going.md'
     - 'Components':
