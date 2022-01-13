@@ -15,21 +15,21 @@ The predictions are then used to update the results of the standard algorithm to
 
 ## MATLAB implementation
 
-The [slam folder](../src/slam) contains a MATLAB implementation of ORB-SLAM that is available via [MathWorks](https://de.mathworks.com/help/vision/ug/monocular-visual-simultaneous-localization-and-mapping.html).
+The `src/slam` folder contains a MATLAB implementation of ORB-SLAM that is available via [MathWorks](https://de.mathworks.com/help/vision/ug/monocular-visual-simultaneous-localization-and-mapping.html).
 While the predicted deformation is computed in Python using SOFA, incorporating that information into the ongoing SLAM process is done in MATLAB.
 The main contributions are located in the [projectionAndPrediction folder](../src/slam/projectionAndPrediction).
 The basic concept of the model-based approach contains methods and scripts to perform the following steps:
 
 * projecting new map points on the surface of the environment model
-    * [projectMapPoints.m](../src/slam/projectionAndPrediction/projectMapPoints.m)
-    * [cameraViewProjection.m](../src/slam/projectionAndPrediction/cameraViewProjection.m)
+    * `projectMapPoints.m`
+    * `cameraViewProjection.m`
 * updating the position of points that were projected at previous iterations based on new predictions of the deformation (forward prediction)
-    * [forwardPrediction.m](../src/slam/projectionAndPrediction/forwardPrediction.m)
+    * `forwardPrediction.m`
 * updating the correspondend 2D position of the feature in the image
-    * [updateFeaturePosition.m](../src/slam/projectionAndPrediction/updateFeaturePosition.m)
+    * `updateFeaturePosition.m`
 * keeping track of projected points, removing points that are no longer considered
-    * [addProjectedPoints.m](../src/slam/projectionAndPrediction/addProjectedPoints.m)
-    * [removeProjectedPoints.m](../src/slam/projectionAndPrediction/removeProjectedPoints.m)
-    * [removeUnprojectedPoints.m](../src/slam/projectionAndPrediction/removeUnprojectedPoints.m)
+    * `addProjectedPoints.m`
+    * `removeProjectedPoints.m`
+    * `removeUnprojectedPoints.m`
 
 The remaining functions are used as helper functions or are deprecated but kept for testing purposes.

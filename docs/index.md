@@ -30,11 +30,11 @@ It builds on top of [QSofaGLViewTools](https://github.com/psomers3/QSofaGLViewTo
 The source code as well as all relevant information can be found in the `src` folder.
 It is split up into:
 
-* the main script [main.py](src/main.py) to run the GUI
+* the main script `main.py` to run the GUI
 * the subfolder `gui` containing
-	* [mainwindow.py](src/gui/mainwindow.py): contains all the GUI elements (Widgets, Layouts, interactive elements,...) as well as the SOFA viewer and an instance of `EngineORB`
-	* [orb.py](src/gui/orb.py): contains the class that is responsible for transformation and exchange of data between the SLAM (MATLAB) and the SOFA simulation (Python)
-	* [plotter.py](src/gui/plotter.py): contains functions to plot the results using [pyqtgraph](https://pyqtgraph.readthedocs.io/en/latest/)
+	* `mainwindow.py`: contains all the GUI elements (Widgets, Layouts, interactive elements,...) as well as the SOFA viewer and an instance of `EngineORB`
+	* `orb.py`: contains the class that is responsible for transformation and exchange of data between the SLAM (MATLAB) and the SOFA simulation (Python)
+	* `plotter.py`: contains functions to plot the results using [pyqtgraph](https://pyqtgraph.readthedocs.io/en/latest/)
 * the subfolder `mesh` containing some basic mesh files and texture images that were used for testing
 * the subfolder `slam` containing
 	* the MATLAB implementation of ORB-SLAM
