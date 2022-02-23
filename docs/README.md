@@ -1,6 +1,6 @@
-# Model-based SLAM
+# MOB-SLAM
 
-MobSLAM is a Simultaneous Localization and Mapping system for deformable environments.
+MOB-SLAM is a Simultaneous Localization and Mapping system for deformable environments.
 This repository contains a graphical user interface that enables 
 
 * the display of a [SOFA simulation](https://www.sofa-framework.org)
@@ -47,7 +47,7 @@ It is split up into:
 	* creates a [NetworkX](https://networkx.org) graph with the features as nodes and user-setting-based edges
 	* displays that graph on top of the image
 
-Please refer to the [homepage](https://pages.github.tik.uni-stuttgart.de/JHaag/Model_based_SLAM/) for more information on contents.
+Please refer to the [homepage](https://jonahaag.github.io/MOB-SLAM/) for more information on contents.
 There is also a small introduction available to get going.
 
 ## Prerequisites
